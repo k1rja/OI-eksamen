@@ -1,0 +1,63 @@
+@use './colors' as c;
+@use './fonts' as f;
+
+* { 
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+  font-family: f.$font-primary;
+  background-color: c.$color-secondary;
+  a {
+    text-decoration: none;
+    color: c.$color-primary;
+  }
+
+  a:hover {
+    color: c.$color-tertiary;
+  }
+
+  h1 {
+    font-family: f.$font-secondary;
+  }
+
+  h2 {
+    font-family: f.$font-secondary;
+    font-variation-settings: "wght" 400;
+  }
+
+  p {
+    font-size: 0.75rem;
+    line-height: 1.5rem;
+  }
+
+
+  @media (min-width: 600px) {
+    p {
+    font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    h1 {
+      font-weight: 700;
+      font-size: clamp(1.6rem, 4vw, 3rem);
+    }
+
+    h2 {
+      font-family: Ruda;
+      font-size: 2.25rem;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+    }
+
+    p {
+      font-size: 1em;
+    }
+
+    
+  }
+}

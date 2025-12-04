@@ -1,0 +1,77 @@
+@use '../assets/_colors.scss' as c;
+@use '../assets/_fonts.scss' as f;
+
+// Én samlet "config" for din primære knap
+$button-primary: (
+  bg:        c.$cta,
+  color:     c.$color-secondary,
+  radius:    10px,
+  border-width: 1px,
+
+  font: (
+    size:     12px,
+    weight:   700,
+    transform: uppercase
+  ),
+
+  size:    (w: 120px,  h: 40px),
+  size-t: (w: 150px, h: 43px, font-size: 14px, weight: 800),
+  size-lg: (w: 200px, h: 50px, font-size: 16px, weight: 900),
+
+  hover-bg: c.$color-tertiary,
+  hover-border: c.$color-primary
+) !default;
+
+// Mixin der læser værdierne fra config'en
+@mixin button($cfg) {
+  $bg:       map-get($cfg, bg);
+  $color:    map-get($cfg, color);
+  $radius:   map-get($cfg, radius);
+  $font:     map-get($cfg, font);
+  $size:     map-get($cfg, size);
+  $size-lg:  map-get($cfg, size-lg);
+  $size-t:   map-get($cfg, size-t); 
+  $hover-bg: map-get($cfg, hover-bg);
+  $hover-border: map-get($cfg, hover-border);
+  $border-width: map-get($cfg, border-width);
+
+  border: $border-width solid transparent;
+
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width:  map-get($size, w);
+  height: map-get($size, h);
+  border-radius: $radius;
+
+  background: $bg;
+  color: $color;
+
+  // font
+  font-size:      map-get($font, size);
+  font-weight:    map-get($font, weight);
+  text-transform: map-get($font, transform);
+
+  &:hover {
+    background: $hover-bg;
+    border-color: $hover-border;
+    transform: translateY(-1px);
+  }
+
+  // Responsiv (læg media inde i samme selector → højere specifikhed)
+  @media (min-width: 600px) {
+    width:      map-get($size-t, w);
+    height:     map-get($size-t, h);
+    font-size:  map-get($size-t, font-size);
+    font-weight: map-get($size-t, weight);
+  }
+
+  @media (min-width: 1024px) {
+    width:      map-get($size-lg, w);
+    height:     map-get($size-lg, h);
+    font-size:  map-get($size-lg, font-size);
+    font-weight: map-get($size-lg, weight);
+  }
+}

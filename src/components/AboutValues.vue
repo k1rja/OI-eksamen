@@ -1,43 +1,42 @@
 <script setup>
-import swimImg    from '@/assets/images/about/swim.webp';
-import stadiumImg from '@/assets/images/about/stadium.webp';
-import sportImg   from '@/assets/images/about/sport.webp';
-import badetImg   from '@/assets/images/about/havnebadet.webp';
-import iceImg     from '@/assets/images/about/iceskating.webp';
+import morehandsImg from '@/assets/images/about/morehands.webp';
+import runningImg   from '@/assets/images/about/running.webp';
+import accessImg    from '@/assets/images/about/accessibility.webp';
+import yogaImg      from '@/assets/images/about/yoga.webp';
 </script>
 
 <template>
-  <section class="about-section about-section--white">
+  <section class="about-section about-section--values">
     <div class="about-container">
-      <h2>Vores faciliteter</h2>
+      <h2>Værdier og vision</h2>
 
       <div class="about-text-split">
         <p>
-          Odense Idrætspark driver og vedligeholder en række moderne idrætsfaciliteter i hele Odense.
-          Her finder du svømmehaller, haller, baner, stadioner og grønne områder til både hverdag og events.
+          Odense Idrætsparks vision er at skabe rammer, hvor alle kan finde glæde ved bevægelse og fællesskab.
+          Vi vil være et sted, hvor både nye og erfarne udøvere føler sig hjemme, og hvor aktiviteterne giver
+          energi, motivation og lyst til at være aktiv i hverdagen. Vi arbejder for at gøre vores faciliteter
+          indbydende, trygge og tilgængelige for alle – uanset alder, niveau og baggrund. Vores værdier bygger
+          på respekt, ansvarlighed og lysten til at bringe mennesker sammen gennem positive oplevelser og stærke
+          fællesskaber.
         </p>
       </div>
 
-      <div class="about-cards about-cards--facilities">
+      <div class="about-cards about-cards--values">
         <article class="about-card">
-          <img :src="swimImg" alt="Billede af svømmehal, som fungerer som genvejsknap til faciliteter" />
-          <span>Svømmehaller</span>
+          <img :src="morehandsImg" alt="En masse hænder, der lægges ovenpå hinanden for at illustrere visionen: fællesskab" />
+          <span>Fællesskab</span>
         </article>
-        <article class="about-card">
-          <img :src="stadiumImg" alt="Billede af fodboldstadion, som fungerer som genvejsknap til faciliteter" />
-          <span>Stadion og arenaer</span>
+        <article class="about-card about-card--offset">
+          <img :src="runningImg" alt="To personer, der løber for at illustrerer visonen: bevægelse " />
+          <span>Bevægelse</span>
         </article>
-        <article class="about-card">
-          <img :src="sportImg" alt="Billede af idrætshal, som fungerer som genvejsknap til faciliteter " />
-          <span>Idrætshaller</span>
+        <article class="about-card about-card--offset">
+          <img :src="accessImg" alt="Forskellige tegnede hænder, hvoraf en af dem sidder i en kørestol, for at illustrere vædien: tilgængelighed  " />
+          <span>Tilgængelighed</span>
         </article>
-        <article class="about-card">
-          <img :src="badetImg" alt="Billede af Odense Havnebad, som fungerer som genvejsknap til faciliteter" />
-          <span>Friluftsfaciliteter</span>
-        </article>
-        <article class="about-card">
-          <img :src="iceImg" alt="Billede af skøjtehal, som fungerer som genvejsknap til faciliteter" />
-          <span>Skøjtehal</span>
+        <article class="about-card about-card--offset">
+          <img :src="yogaImg" alt="To snakkende personer med en yogamåtte for at illustrere værdien: Ansvarlighed" />
+          <span>Ansvarlighed</span>
         </article>
       </div>
     </div>
@@ -49,18 +48,18 @@ import iceImg     from '@/assets/images/about/iceskating.webp';
     @use '../assets/_fonts.scss' as f;
 
     .about-section {
-        background-color: c.$color-secondary;
+        background-color: #fefffe;
         color: c.$color-primary;
 
-        &--white {
-            background-color: c.$color-secondary;
+        &--values {
+            background-color: #fefffe;
             color: c.$color-primary;
 
             h2,
             p {
             color: c.$color-primary;
             }
-
+            
             .about-text-split p {
             max-width: none;
             }
@@ -116,14 +115,14 @@ import iceImg     from '@/assets/images/about/iceskating.webp';
         margin-top: 2rem;
 
         @media (min-width: 600px) {
-            &--facilities {
-                grid-template-columns: repeat(3, 1fr);
+            &--values {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (min-width: 1024px) {
-            &--facilities {
-                grid-template-columns: repeat(5, 1fr);
+            &--values {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     }
@@ -132,16 +131,21 @@ import iceImg     from '@/assets/images/about/iceskating.webp';
         position: relative;
         border-radius: 10px;
         overflow: hidden;
-        background-color: c.$color-secondary;
+        background-color: #fefffe;
 
         img {
             width: 100%;
             height: 160px;
             object-fit: cover;
+            object-position: 50% 50%;
             display: block;
             transition: transform 0.3s ease;
             z-index: 0;
             position: relative;
+        }
+
+        &--offset img {
+            object-position: 50% 35%;
         }
 
         &::after {

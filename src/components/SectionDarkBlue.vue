@@ -1,0 +1,119 @@
+<script setup>
+defineProps({
+  title: String,
+  text: String,
+  slots: Object,
+  buttonText: String,
+  buttonLink: String,
+  image: String
+})
+</script>
+
+<template>
+  <section class="dark_blue_section">
+    <img class="section_img" v-if="image" :src="image" alt="">
+    <div class="content_blue">
+      <h2 class="content_h2" v-html="title"></h2>
+      <p class="content_p" v-html="text"></p>
+
+      <slot name="extra"></slot>
+
+      <div class="content_btn">
+        <RouterLink
+          v-if="buttonText && buttonLink"
+          :to="buttonLink"
+          class="btn"
+        >
+          {{ buttonText }}
+        </RouterLink>
+      </div>
+    </div>
+  </section>
+</template>
+
+
+<style scoped lang="scss">
+@use '../assets/_colors.scss' as c;
+@use '../assets/_fonts.scss' as f;
+@use '../assets/_buttons.scss' as b;
+
+.dark_blue_section {
+  background-color: c.$color-primary;
+  color: c.$color-secondary;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 50px;
+}
+
+.content_h2 { font-variation-settings: "wght" 400 !important; }
+.content_h2 :deep(span) { font-variation-settings: "wght" 800 !important; }
+.content_p { font-variation-settings: "wght" 400 !important; }
+.content_p :deep(span) { font-variation-settings: "wght" 800 !important; }
+
+
+.section_img {
+  width: 100%;
+}
+
+.content_blue {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 20px 30px;
+}
+
+.content_btn {
+  display: flex;
+}
+
+.link_btn:hover {
+    color: c.$color-secondary;
+}
+
+.link_btn {
+    color: c.$color-secondary;
+}
+
+.content_h2 {
+  margin: 20px 0px;
+}
+
+.content_p {
+  line-height: 1.5rem;
+}
+
+.btn {
+  @include b.button(b.$button-primary);
+  margin-top: 20px;
+}
+
+@media (min-width: 1024px) {
+  .dark_blue_section {
+    flex-direction: row;
+    padding: 0%;
+  }
+
+  .content_blue {
+    padding: 2rem 4rem;
+    margin-block: 0;
+    width: 100%;
+  }
+
+  .content_p {
+    line-height: 2.2rem;
+  }
+
+  .section_img {
+    width: 50%;
+  }
+
+  .content_btn {
+    justify-content: left;
+  }
+
+  .btn {
+    margin-top: 30px;
+  }
+}
+
+</style>
