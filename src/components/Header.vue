@@ -5,8 +5,9 @@
     import logIndIkon from '@/assets/images/ikoner/logind-ikon.webp'
     import dropdownPil from '@/assets/images/ikoner/dropdown_pil.webp'
 
-    import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
     import { useRouter } from 'vue-router'
+    import { role } from '@/stores/authState'
 
 
     const activeIndex = ref(null)
@@ -40,6 +41,17 @@
 
     const router = useRouter()
     router.afterEach(() => { activeIndex.value = null; isMenuOpen.value = false })
+
+    const goToLogin = () => {
+    router.push('/login')
+    }
+
+    // tekst ved login (desktop)
+    const accountLabel = computed(() => {
+    if (role.value === 'user') return 'Min konto'
+    if (role.value === 'admin') return 'Administrator'
+    return 'Log ind'
+    })
 
 </script>
 
@@ -132,9 +144,13 @@
             </div>
 
             <div class="mobil_header_actions">
-                <div class="header_actions_login">
+                <button
+                    type="button"
+                    class="header_actions_login"
+                    @click="goToLogin"
+                >
                     <img class="mobil_ikon_img" :src="logIndIkon" alt="Logind ikon" />
-                </div>
+                </button>
             </div>
         </div>
 
@@ -159,11 +175,13 @@
                 </RouterLink>
             </div>
 
-            <div class="top_header_actions">
+            <div class="top_header_actions" @click="goToLogin">
                 <div class="header_actions_login">
                     <img class="actions_img" :src="logIndIkon" alt="Logind ikon" />
                 </div>
-                <p class="actions_LogInd_p">Log ind</p>
+                <p class="actions_LogInd_p">
+                    {{ accountLabel }}
+                </p>
             </div>
         </div>
 

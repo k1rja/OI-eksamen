@@ -1,22 +1,21 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import Calendar from '../views/Calendar.vue'
-import Events from '../views/Events.vue'
-import Header from '@/components/Header.vue'
+
+import HomeView from '@/views/HomeView.vue'
+import Calendar from '@/views/Calendar.vue'
+import Events from '@/views/Events.vue'
+
 import AktivitetsOversigt from '@/views/AktivitetsOversigt.vue'
-import HeroSlideshow from '@/components/HeroSlideshow.vue'
-import MiniCalendar from '@/components/MiniCalendar.vue'
-import SectionDarkBlue from '@/components/SectionDarkBlue.vue'
-import FindActivity from '@/components/FindActivity.vue'
-import OpeningHours from '@/components/OpeningHours.vue'
-import ForeningsTamplate from '@/components/ForeningsTamplate.vue'
 import ForeningsStrength from '@/views/ForeningsStrength.vue'
 import OmOs from '@/views/OmOs.vue'
 import Kontakt from '@/views/Kontakt.vue'
 import KontaktFormular from '@/views/KontaktFormular.vue'
 import KlodsterBakken from '@/views/KlodsterBakken.vue'
 import Havnebadet from '@/views/Havnebadet.vue'
+import LoginChoice from '@/views/LoginChoice.vue'
+
+// OBS: komponenter som Header, HomeSchedule, SectionDarkBlue, FindActivity,
+// OpeningHours osv. bruger du inde i views – de behøver normalt ikke egne routes,
+// så dem har jeg ikke importeret her.
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,7 +25,13 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-    { path: '/calendar',
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginChoice,
+    },
+    { 
+      path: '/calendar',
       name: 'calendar',
       component: Calendar, 
     },
@@ -35,51 +40,20 @@ const router = createRouter({
       name: 'events',
       component: Events,
     },
-    {
-      path: '/header',
-      name: 'header',
-      component: Header,
-    },
+
+    // Aktiviteter / foreninger
     {
       path: '/aktivitetsoversigt',
       name: 'aktivitetsoversigt',
       component: AktivitetsOversigt,
     },
     {
-      path: '/heroslide',
-      name: 'heroslide',
-      component: HeroSlideshow,
-    },
-    {
-      path: '/minicalendar',
-      name: 'minicalendar',
-      component: MiniCalendar,
-    },
-    {
-      path: '/sectiondarkblue',
-      name: 'sectiondarkblue',
-      component: SectionDarkBlue,
-    },
-    {
-      path:'/findactivity',
-      name: 'findactivity',
-      component: FindActivity,
-    },
-    {
-      path: '/openinghours',
-      name: 'openinghours',
-      component: OpeningHours,
-    },
-    {
-      path: '/foreningstamplate',
-      name: 'foreningstamplate',
-      component: ForeningsTamplate,
-    },
-    {
       path: '/foreningsstrength',
       name: 'foreningsstrength',
       component: ForeningsStrength,
     },
+
+    // Om os + kontakt
     {
       path: '/omos',
       name: 'omos',
@@ -91,20 +65,24 @@ const router = createRouter({
       component: Kontakt,
     },
     {
+      path: '/kontaktformular',
+      name: 'kontaktformular',
+      component: KontaktFormular,
+    },
+
+    // Lokationer
+    {
       path: '/klodsterbakken',
       name: 'klodsterbakken',
-      component: KlodsterBakken
+      component: KlodsterBakken,
     },
     {
       path: '/havnebadet',
       name: 'havnebadet',
       component: Havnebadet,
     },
-    {
-      path: '/kontaktformular',
-      name: 'kontaktformular',
-      component: KontaktFormular,
-    },
+
+    // Diverse admin / ekstra sider
     {
       path: '/activities/movetraining',
       name: 'movetraining',
@@ -123,4 +101,3 @@ const router = createRouter({
 })
 
 export default router
-

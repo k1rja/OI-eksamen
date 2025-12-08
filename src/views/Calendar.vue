@@ -1,201 +1,84 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import EventForm from '../components/EventForm.vue'
-import { eventStartMs } from '../utils/date'
+import { ref } from 'vue'
+import AdminActivities from '@/components/AdminActivities.vue'
+import AdminEvents from '@/components/AdminEvents.vue'
 
-const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
-
-const events = ref([])
-const loading = ref(false)
-const error = ref('')
-
-const editingEvent = ref(null)
-
-async function load() {
-  loading.value = true
-  error.value = ''
-  try {
-    const res = await fetch(`${DB_URL}/events.json`)
-    if (!res.ok) throw new Error('HTTP ' + res.status)
-    const raw = await res.json() || {}
-    events.value = Object.entries(raw)
-      .map(([id, v]) => (v ? { id, ...v } : null))
-      .filter(Boolean)
-  } catch (e) {
-    console.error(e)
-    error.value = 'Kunne ikke hente hold.'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(load)
-
-const sortedEvents = computed(() =>
-  [...events.value].sort((a, b) => eventStartMs(a) - eventStartMs(b))
-)
-
-function onCreated(newEvent) {
-  if (!newEvent?.id) return
-  events.value.push(newEvent)
-}
-
-function onEdit(ev) {
-  editingEvent.value = { ...ev }
-}
-function cancelEdit() {
-  editingEvent.value = null
-}
-
-async function onUpdated(updated) {
-  if (!updated?.id) return
-
-  const priceText = updated.priceText ?? ''
-  const price = clamp0(parsePrice(priceText))
-
-  const { id, ...payload } = {
-    ...updated,
-    priceText,
-    price,
-  }
-
-  try {
-    const res = await fetch(`${DB_URL}/events/${id}.json`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-    if (!res.ok) throw new Error('HTTP ' + res.status)
-
-    const i = events.value.findIndex(e => e.id === id)
-    if (i !== -1) events.value[i] = { id, ...payload }
-
-    editingEvent.value = null
-  } catch (e) {
-    console.error(e)
-    alert('Kunne ikke gemme ændringer.')
-  }
-}
-
-async function onDelete(id) {
-  if (!confirm('Slet hold?')) return
-  const res = await fetch(`${DB_URL}/events/${id}.json`, { method: 'DELETE' })
-  if (!res.ok) return alert('Kunne ikke slette hold.')
-  events.value = events.value.filter(e => e?.id !== id)
-  const r2 = await fetch(`${DB_URL}/booking/${id}.json`, { method: 'DELETE' })
-  if (!r2.ok) console.warn('Kunne ikke slette booking for id:', id)
-}
-
-function parsePrice(txt) {
-  if (txt == null) return 0
-  const s = String(txt).replace(',', '.')
-  const m = s.match(/(\d+(\.\d+)?)/)
-  return m ? Number(m[1]) : 0
-}
-const clamp0 = (n) => (Number.isFinite(n) && n > 0 ? n : 0)
+// starter på "events" (Hold). Skift til "activities" hvis du hellere vil starte dér.
+const activeTab = ref('events')  // 'activities' eller 'events'
 </script>
 
 <template>
-  <main class="calendar">
-    <section v-if="!editingEvent" class="panel">
-      <EventForm @created="onCreated" />
-    </section>
+  <main class="adminPage">
 
-    <section v-else class="panel">
-      <h2>Redigér hold</h2>
-      <EventForm :event="editingEvent" @updated="onUpdated" />
-      <div class="panel__actions">
-        <button type="button" @click="cancelEdit">Fortryd redigering</button>
-      </div>
-    </section>
+    <!-- Tabs -->
+    <header class="adminTabs">
+      <button
+        type="button"
+        class="adminTabs__btn"
+        :class="{ 'adminTabs__btn--active': activeTab === 'activities' }"
+        @click="activeTab = 'activities'"
+      >
+        Aktiviteter
+      </button>
 
-    <hr class="calendar__divider" />
+      <button
+        type="button"
+        class="adminTabs__btn"
+        :class="{ 'adminTabs__btn--active': activeTab === 'events' }"
+        @click="activeTab = 'events'"
+      >
+        Hold
+      </button>
+    </header>
 
-    <section class="calendar__list">
-      <header class="calendar__header">
-        <h2 class="calendar__title">Holdoversigt</h2>
-        <span v-if="loading">Henter…</span>
-      </header>
-
-      <p v-if="error" class="calendar__error">{{ error }}</p>
-
-      <ul v-if="sortedEvents.length" class="calendar__items">
-        <li v-for="event in sortedEvents" :key="event.id" class="calendar__item">
-          <div class="calendar__itemMain">
-            <strong class="calendar__name">{{ event.title ?? 'Uden titel' }}</strong>
-            <div class="calendar__meta">
-              <span>{{ event.date }} • {{ event.start || '—' }}–{{ event.end || '—' }}</span>
-              <span v-if="event.location"> • {{ event.location }}</span>
-              <span v-if="event.priceText || event.price !== undefined">
-                • Pris: {{ event.priceText ?? (event.price + ' kr.') }}
-              </span>
-            </div>
-            <p v-if="event.description" class="calendar__desc">{{ event.description }}</p>
-          </div>
-
-          <div class="calendar__actions">
-            <button @click="onEdit(event)">Rediger</button>
-            <button @click="onDelete(event.id)">Slet</button>
-          </div>
-        </li>
-      </ul>
-
-      <p v-else>Ingen hold endnu.</p>
+    <!-- Indhold: vi viser KUN det ene komponent ad gangen -->
+    <section class="adminPage__content">
+      <AdminActivities v-if="activeTab === 'activities'" />
+      <AdminEvents v-else />
     </section>
   </main>
 </template>
 
-<style scoped>
-.calendar { 
-  display: grid; 
-  gap: 24px; 
-  padding: 24px; 
+<style scoped lang="scss">
+@use '../assets/_colors.scss' as c;
+
+.adminPage {
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+  margin-top: 40px;
 }
 
-.calendar__divider { 
-  border: none; 
-  border-top: 1px solid #eee; 
+.adminPage__title {
+  font-size: 1.6rem;
+  margin: 0;
 }
 
-.calendar__header { 
-  display: flex; 
-  gap: 12px; 
-  align-items: baseline; 
+/* Tabs-linje – må ikke ligne knapper */
+.adminTabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #000;
+  padding: 8px 0 6px;
+  font-size: 1.8rem;
 }
 
-.calendar__items { 
-  list-style: none; 
-  margin: 0; 
-  padding: 0; 
-  display: grid; 
-  gap: 10px; 
+.adminTabs__btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 400;
+  color: #000;
+  padding: 0 0 4px;
 }
 
-.calendar__item {
-  display: flex; 
-  justify-content: space-between; 
-  gap: 16px;
-  padding: 12px; 
-  border: 1px solid #eee; 
-  border-radius: 12px;
+.adminTabs__btn--active {
+  font-weight: 700;
+  border-bottom: 3px solid #000;
 }
 
-.calendar__actions { 
-  display: flex; 
-  gap: 8px; 
-}
-
-.calendar__error { 
-  color: #b00020; 
-}
-
-.panel { 
-  padding: 16px; 
-  border: 1px solid #e6e6e6; 
-  border-radius: 12px; 
-}
-
-.panel__actions { 
-  margin-top: 8px; 
+.adminPage__content {
+  margin-top: 12px;
 }
 </style>

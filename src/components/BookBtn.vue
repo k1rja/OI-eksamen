@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const BASE = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
-
-
 const props = defineProps({
-  id: { type: String, required: true }
+  id: { type: String, required: true },
 })
+
+// Base-URL til Firebase
+const BASE = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
 
 const status = ref(0)            // 0 = ikke tilmeldt, 1 = tilmeldt
 const loading = ref(false)
@@ -15,10 +15,15 @@ const error = ref('')
 const showConfirm = ref(false)   // styrer modal
 const pendingAction = ref(null)  // 'join' | 'leave' | null
 
-const PATH = `${BASE}/booking/${encodeURIComponent(props.id)}.json`
+// Beskyt mod manglende BASE, så vi ikke får undefined i fetch
+const PATH = BASE
+  ? `${BASE}/booking/${encodeURIComponent(props.id)}.json`
+  : ''
 
 onMounted(load)
-async function load() {
+
+async function load () {
+  if (!PATH) return
   loading.value = true
   error.value = ''
   try {
@@ -27,7 +32,7 @@ async function load() {
     const data = await res.json()
     status.value = (data === 0 || data === 1) ? data : 0
   } catch (e) {
-    console.error('[BookButton][GET] failed:', e)
+    console.error('[BookBtn][GET] failed:', e)
     error.value = 'Kunne ikke hente status.'
   } finally {
     loading.value = false
@@ -35,26 +40,27 @@ async function load() {
 }
 
 // Åbn modal med korrekt "tilmelding/afmelding" kontekst
-function openConfirm() {
+function openConfirm () {
   pendingAction.value = (status.value === 1) ? 'leave' : 'join'
   showConfirm.value = true
 }
 
 // Luk modal uden at gøre noget
-function closeConfirm() {
+function closeConfirm () {
   showConfirm.value = false
   pendingAction.value = null
 }
 
-// Kør den eksisterende toggle når brugeren bekræfter i modalen
-async function confirmAction() {
+// Kør toggle når brugeren bekræfter i modalen
+async function confirmAction () {
   if (!pendingAction.value) return
   await toggleOnServer()
   closeConfirm()
 }
 
-// Ren toggle-funktion (din tidligere onToggle)
-async function toggleOnServer() {
+// Ren toggle-funktion (PUT til Firebase)
+async function toggleOnServer () {
+  if (!PATH) return
   loading.value = true
   error.value = ''
   try {
@@ -67,7 +73,7 @@ async function toggleOnServer() {
     if (!res.ok) throw new Error(`PUT ${res.status} ${res.statusText}`)
     status.value = next
   } catch (e) {
-    console.error('[BookButton][PUT] failed:', e)
+    console.error('[BookBtn][PUT] failed:', e)
     error.value = 'Kunne ikke gemme status.'
   } finally {
     loading.value = false
@@ -76,76 +82,108 @@ async function toggleOnServer() {
 </script>
 
 <template>
-  <!-- Primær knap -->
-  <button
-    @click="openConfirm"
-    :disabled="loading"
-    :class="{ active: status === 1 }"
-  >
-    {{ status === 1 ? 'AFMELD' : 'TILMELD' }}
-  </button>
+  <!-- Primær knap på kortet -->
+    <button
+        type="button"
+        class="adminBtn adminBtn--danger"
+        @click="openConfirm"
+        :disabled="loading || !PATH"
+        >
+        {{ status === 1 ? 'AFMELD' : 'TILMELD' }}
+    </button>
+
 
   <!-- Bekræftelses-popup -->
   <div
     v-if="showConfirm"
     class="modal-backdrop"
   >
-    <div class="modal" role="dialog" aria-modal="true">
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+    >
       <h2 class="modal__title">
         Bekræft din {{ pendingAction === 'join' ? 'tilmelding' : 'afmelding' }}
       </h2>
 
-      <p class="modal__text" v-if="pendingAction === 'join'">
-        Skulle du blive forhindret, så husk at afmelde dig <strong>senest 12 timer før</strong>,
-        så en anden kan tilmelde holdet.
+      <p
+        v-if="pendingAction === 'join'"
+        class="modal__text"
+      >
+        Skulle du blive forhindret, så husk at afmelde dig
+        <strong> senest 12 timer før</strong>, så en anden kan tilmelde holdet.
       </p>
-      <p class="modal__text" v-else>
-        Ved afmeldelse af aktivitet risikerer du, at din plads går videre til en på
-        evt. venteliste og dermed mister du din plads.
+
+      <p
+        v-else
+        class="modal__text"
+      >
+        Ved afmeldelse af aktivitet risikerer du, at din plads går videre til en
+        evt. venteliste – og du mister din plads.
       </p>
 
       <div class="modal__actions">
-        <button class="btn btn--outline" @click="closeConfirm" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn--outline"
+          @click="closeConfirm"
+          :disabled="loading"
+        >
           ANNULLER
         </button>
-        <button class="btn btn--solid" @click="confirmAction" :disabled="loading">
+
+        <button
+          type="button"
+          class="btn btn--solid"
+          @click="confirmAction"
+          :disabled="loading"
+        >
           {{ pendingAction === 'join' ? 'TILMELD' : 'AFMELD' }}
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Evt. fejlboks -->
-  <p v-if="error" class="error">{{ error }}</p>
+  <!-- Evt. fejltekst -->
+  <p
+    v-if="error"
+    class="error"
+  >
+    {{ error }}
+  </p>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @use '../assets/_buttons.scss' as btn;
 @use '../assets/_fonts.scss' as f;
 @use '../assets/_colors.scss' as c;
 
-button {
-  @include btn.button(btn.$button-primary);
+/* ---------- KORT-KNAP (samme størrelse som adminBtn) ---------- */
+
+.bookBtn {
+  @include btn.button(btn.$button-primary); // samme config som adminBtn
   font-family: f.$font-primary;
   border: 0;
   cursor: pointer;
 }
 
-button.active {
+.bookBtn--active {
   background: c.$color-primary;
 }
 
-button:disabled {
+.bookBtn:disabled {
   opacity: 0.6;
   cursor: default;
   transform: none;
 }
 
-/* Modal styles */
+/* ---------- Modal styles (uændret) ---------- */
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.35);
+  background: rgba(0, 0, 0, .35);
   display: grid;
   place-items: center;
   z-index: 999;
@@ -153,19 +191,15 @@ button:disabled {
 
 .modal {
   width: min(640px, 92vw);
-  height: 300px;
   background: c.$color-secondary;
   border-radius: 14px;
-  z-index: 1000;
-  pointer-events: auto; 
   box-shadow:
-    0 20px 40px rgba(0,0,0,.25),
-    0 2px 6px rgba(0,0,0,.15);
-  padding: 28px 28px 24px;
+    0 20px 40px rgba(0, 0, 0, .25),
+    0 2px 6px rgba(0, 0, 0, .15);
+  padding: 50px 40px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 50px;
 }
 
 .modal__title {
@@ -175,10 +209,7 @@ button:disabled {
   font-size: clamp(24px, 3.2vw, 40px);
   line-height: 1.1;
   margin: 0 0 12px;
-  display: block;        
-  text-align: center;    
-  margin-left: auto;    
-  margin-right: auto;
+  text-align: center;
 }
 
 .modal__text {
@@ -186,10 +217,7 @@ button:disabled {
   font-size: 16px;
   line-height: 1.6;
   margin: 0 0 20px;
-  display: block;        
-  text-align: center;    
-  margin-left: auto;    
-  margin-right: auto;
+  text-align: center;
 }
 
 .modal__actions {
@@ -199,6 +227,7 @@ button:disabled {
   margin-top: 8px;
 }
 
+/* knapper i modalen */
 .btn {
   @include btn.button(btn.$button-primary);
   font-weight: 900;
@@ -217,13 +246,15 @@ button:disabled {
 }
 
 .btn--solid {
-  background: c.$cta; /* din orange farve */
+  background: c.$cta;
   border: 0;
   color: c.$color-secondary;
 }
 
+/* fejltekst under knappen */
 .error {
   margin-top: 10px;
   color: c.$color-secondary;
+  font-size: 0.8rem;
 }
 </style>

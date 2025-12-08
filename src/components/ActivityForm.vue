@@ -2,27 +2,28 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  event: { type: Object, default: null },
+  activity: { type: Object, default: null }, // bruges ved redigering
 })
 
-const emit = defineEmits(['created', 'updated'])
+const emit = defineEmits(['created', 'updated', 'cancel'])
 
 const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
 
 const form = ref({
   id: null,
   title: '',
+  lead: '',
   date: '',
   start: '',
   end: '',
   location: '',
   priceText: '',
-  description: '',
   infoText: '',
   whatToBring: '',
   facilityOpeningHours: '',
-  isFamilyFriendly: false,
-  isKidFriendly: false,
+  // tags
+  isFamily: false,
+  isKids: false,
   isIndoor: false,
   isOutdoor: false,
   isCalm: false,
@@ -44,8 +45,8 @@ const clamp0 = (n) => (Number.isFinite(n) && n > 0 ? n : 0)
 function buildTagsFromForm() {
   const f = form.value
   return [
-    f.isFamilyFriendly && 'family',
-    f.isKidFriendly && 'kids',
+    f.isFamily && 'family',
+    f.isKids && 'kids',
     f.isIndoor && 'indoor',
     f.isOutdoor && 'outdoor',
     f.isCalm && 'calm',
@@ -53,46 +54,47 @@ function buildTagsFromForm() {
   ].filter(Boolean)
 }
 
+// sync når vi redigerer
 watch(
-  () => props.event,
-  (ev) => {
-    if (ev) {
-      const tags = Array.isArray(ev.tags) ? ev.tags : []
+  () => props.activity,
+  (act) => {
+    if (act) {
+      const tags = Array.isArray(act.tags) ? act.tags : []
       form.value = {
-        id: ev.id ?? null,
-        title: ev.title ?? '',
-        date: ev.date ?? '',
-        start: ev.start ?? '',
-        end: ev.end ?? '',
-        location: ev.location ?? '',
+        id: act.id ?? null,
+        title: act.title ?? '',
+        lead: act.lead ?? '',
+        date: act.date ?? '',
+        start: act.start ?? '',
+        end: act.end ?? '',
+        location: act.location ?? '',
         priceText:
-          ev.priceText ?? (Number.isFinite(ev.price) ? String(ev.price) : ''),
-        description: ev.description ?? '',
-        infoText: ev.infoText ?? '',
-        whatToBring: ev.whatToBring ?? '',
-        facilityOpeningHours: ev.facilityOpeningHours ?? '',
-        isFamilyFriendly: ev.isFamilyFriendly ?? tags.includes('family'),
-        isKidFriendly: ev.isKidFriendly ?? tags.includes('kids'),
-        isIndoor: ev.isIndoor ?? tags.includes('indoor'),
-        isOutdoor: ev.isOutdoor ?? tags.includes('outdoor'),
-        isCalm: ev.isCalm ?? tags.includes('calm'),
-        isActive: ev.isActive ?? tags.includes('active'),
+          act.priceText ?? (Number.isFinite(act.price) ? String(act.price) : ''),
+        infoText: act.infoText ?? '',
+        whatToBring: act.whatToBring ?? '',
+        facilityOpeningHours: act.facilityOpeningHours ?? '',
+        isFamily: tags.includes('family'),
+        isKids: tags.includes('kids'),
+        isIndoor: tags.includes('indoor'),
+        isOutdoor: tags.includes('outdoor'),
+        isCalm: tags.includes('calm'),
+        isActive: tags.includes('active'),
       }
     } else {
       form.value = {
         id: null,
         title: '',
+        lead: '',
         date: '',
         start: '',
         end: '',
         location: '',
         priceText: '',
-        description: '',
         infoText: '',
         whatToBring: '',
         facilityOpeningHours: '',
-        isFamilyFriendly: false,
-        isKidFriendly: false,
+        isFamily: false,
+        isKids: false,
         isIndoor: false,
         isOutdoor: false,
         isCalm: false,
@@ -109,8 +111,8 @@ async function onSubmit() {
   error.value = ''
   success.value = false
 
-  if (!form.value.title || !form.value.date || !form.value.start) {
-    error.value = 'Udfyld titel, dato og starttid.'
+  if (!form.value.title) {
+    error.value = 'Skriv mindst en titel på aktiviteten.'
     return
   }
 
@@ -120,39 +122,31 @@ async function onSubmit() {
 
   const basePayload = {
     title: form.value.title,
-    date: form.value.date,
-    start: form.value.start,
+    lead: form.value.lead || '',
+    date: form.value.date || '',
+    start: form.value.start || '',
     end: form.value.end || '',
     location: form.value.location || '',
     priceText,
     price,
-    description: form.value.description || '',
     infoText: form.value.infoText || '',
     whatToBring: form.value.whatToBring || '',
     facilityOpeningHours: form.value.facilityOpeningHours || '',
-    isFamilyFriendly: form.value.isFamilyFriendly,
-    isKidFriendly: form.value.isKidFriendly,
-    isIndoor: form.value.isIndoor,
-    isOutdoor: form.value.isOutdoor,
-    isCalm: form.value.isCalm,
-    isActive: form.value.isActive,
     tags,
   }
 
   submitting.value = true
   try {
     // REDIGERING
-    if (props.event && form.value.id) {
-      emit('updated', {
-        id: form.value.id,
-        ...basePayload,
-      })
+    if (props.activity && form.value.id) {
+      const updated = { id: form.value.id, ...basePayload }
+      emit('updated', updated)
       success.value = true
       return
     }
 
     // OPRETTELSE
-    const res = await fetch(`${DB_URL}/events.json`, {
+    const res = await fetch(`${DB_URL}/activities.json`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -163,27 +157,23 @@ async function onSubmit() {
     if (!res.ok) throw new Error('HTTP ' + res.status)
     const { name: id } = await res.json()
 
-    const created = {
-      id,
-      ...basePayload,
-    }
-
+    const created = { id, ...basePayload }
     emit('created', created)
 
     form.value = {
       id: null,
       title: '',
+      lead: '',
       date: '',
       start: '',
       end: '',
       location: '',
       priceText: '',
-      description: '',
       infoText: '',
       whatToBring: '',
       facilityOpeningHours: '',
-      isFamilyFriendly: false,
-      isKidFriendly: false,
+      isFamily: false,
+      isKids: false,
       isIndoor: false,
       isOutdoor: false,
       isCalm: false,
@@ -192,49 +182,69 @@ async function onSubmit() {
     success.value = true
   } catch (e) {
     console.error(e)
-    error.value = 'Kunne ikke gemme.'
+    error.value = 'Kunne ikke gemme aktiviteten.'
   } finally {
     submitting.value = false
-    if (success.value && !props.event) setTimeout(() => (success.value = false), 1200)
+    if (success.value && !props.activity) setTimeout(() => (success.value = false), 1200)
   }
+}
+
+function onCancel() {
+  emit('cancel')
 }
 </script>
 
 <template>
   <form class="adminForm" @submit.prevent="onSubmit">
-    <label>Titel *</label>
-    <input v-model.trim="form.title" />
+    <label>
+      Titel *
+      <input v-model.trim="form.title" />
+    </label>
 
-    <label>Dato *</label>
-    <input type="date" v-model="form.date" />
+    <label>
+      Kort intro / beskrivelse
+      <textarea v-model.trim="form.lead" rows="3" />
+    </label>
 
-    <div class="event-form__row">
-        <label>
-            Starttid *
-            <input type="time" v-model="form.start" />
-        </label>
+    <label>
+      Dato
+      <input type="date" v-model="form.date" />
+    </label>
 
-        <label>
-            Sluttid
-            <input type="time" v-model="form.end" />
-        </label>
+    <div class="adminForm__row">
+      <label>
+        Starttid
+        <input type="time" v-model="form.start" />
+      </label>
+
+      <label>
+        Sluttid
+        <input type="time" v-model="form.end" />
+      </label>
     </div>
 
-    <label>Lokation</label>
-    <input v-model.trim="form.location" />
+    <label>
+      Lokation
+      <input
+        v-model.trim="form.location"
+        placeholder="Fx. Havnebadet, Svømmehal Syd"
+      />
+    </label>
 
-    <label>Pris</label>
-    <input type="text" v-model.trim="form.priceText" />
-
-    <label>Beskrivelse</label>
-    <textarea v-model.trim="form.description" rows="3" />
+    <label>
+      Pris (visning)
+      <input
+        v-model.trim="form.priceText"
+        placeholder="Fx. 40 kr., Gratis, 2 klip"
+      />
+    </label>
 
     <label>
       Godt at vide
       <textarea
         v-model.trim="form.infoText"
         rows="2"
-        placeholder="Praktisk info, fx om omklædning, adgang, parkering …"
+        placeholder="Praktisk info, parkeringsforhold, særlige hensyn osv."
       />
     </label>
 
@@ -243,7 +253,7 @@ async function onSubmit() {
       <textarea
         v-model.trim="form.whatToBring"
         rows="2"
-        placeholder="Fx. svømmetøj, drikkedunk, håndklæde ..."
+        placeholder="Fx. håndklæde, drikkedunk, indendørssko ..."
       />
     </label>
 
@@ -257,7 +267,17 @@ async function onSubmit() {
     </label>
 
     <fieldset class="adminForm__tags">
-      <legend>Kendetegn (til filtrering på forsiden)</legend>
+      <legend>Kendetegn (til filtrering)</legend>
+
+      <label>
+        <input type="checkbox" v-model="form.isFamily" />
+        Familievenlig
+      </label>
+
+      <label>
+        <input type="checkbox" v-model="form.isKids" />
+        Børnevenlig
+      </label>
 
       <label>
         <input type="checkbox" v-model="form.isIndoor" />
@@ -271,7 +291,7 @@ async function onSubmit() {
 
       <label>
         <input type="checkbox" v-model="form.isCalm" />
-        Roligt tempo
+        Rolig aktivitet
       </label>
 
       <label>
@@ -280,16 +300,28 @@ async function onSubmit() {
       </label>
     </fieldset>
 
-    <button
-      :disabled="submitting"
-      class="adminBtn adminBtn--primary adminBtn--full"
-    >
-      {{ submitting ? 'Gemmer...' : (props.event ? 'Gem ændringer' : 'Opret hold') }}
-    </button>
+    <div class="adminForm__actions">
+      <button
+        type="submit"
+        class="adminBtn adminBtn--primary adminBtn--full"
+        :disabled="submitting"
+      >
+        {{ submitting ? 'Gemmer…' : (props.activity ? 'Gem ændringer' : 'Opret aktivitet') }}
+      </button>
+
+      <button
+        v-if="props.activity"
+        type="button"
+        class="adminBtn adminBtn--secondary"
+        @click="onCancel"
+      >
+        Fortryd
+      </button>
+    </div>
 
     <p v-if="error" class="msg msg--error">{{ error }}</p>
     <p v-if="success" class="msg msg--success">
-      ✔ {{ props.event ? 'Ændringer gemt!' : 'Hold oprettet!' }}
+      ✔ {{ props.activity ? 'Ændringer gemt!' : 'Aktivitet oprettet!' }}
     </p>
   </form>
 </template>
@@ -318,23 +350,22 @@ async function onSubmit() {
   font-size: 0.9rem;
 }
 
-/* start/slut i række – matcher aktivitetssiden */
-.event-form__row {
+.adminForm__row {
   display: grid;
   gap: 10px;
 }
 
 @media (min-width: 600px) {
-  .event-form__row {
+  .adminForm__row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .adminForm__tags {
-  margin-top: 8px;
-  border-radius: 8px;
-  border: 1px dashed #ddd;
-  padding: 8px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px dashed #d0d0d0;
   display: grid;
   gap: 4px;
 }
@@ -345,20 +376,27 @@ async function onSubmit() {
 }
 
 .adminForm__tags label {
-  font-size: 0.85rem;
-  display: flex;
-  gap: 6px;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
 }
 
-/* knap – samme størrelse som forsiden */
+.adminForm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* knapper – bruger din globale mixin */
 .adminBtn {
   @include btn.button(btn.$button-primary);
-  display: inline-flex;
+  display: inline-flex;   // gør den smal
   margin-top: 12px;
   cursor: pointer;
 }
 
+/* beskeder */
 .msg {
   font-size: 0.85rem;
   margin-top: 4px;
@@ -372,3 +410,4 @@ async function onSubmit() {
   color: #1b7a34;
 }
 </style>
+
