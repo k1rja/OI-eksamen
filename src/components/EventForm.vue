@@ -220,11 +220,21 @@ async function onSubmit() {
         </label>
     </div>
 
-    <label>Lokation</label>
-    <input v-model.trim="form.location" />
+    <label>
+      Lokation
+      <input
+        v-model.trim="form.location"
+        placeholder="Fx. Svømmehallen Højme, Svømmehallen Klosterbakken"
+      />
+    </label>
 
-    <label>Pris</label>
-    <input type="text" v-model.trim="form.priceText" />
+    <label>
+      Pris
+      <input
+        v-model.trim="form.priceText"
+        placeholder="Fx. 40 kr., Gratis, 2 klip"
+      />
+    </label>
 
     <label>Beskrivelse</label>
     <textarea v-model.trim="form.description" rows="3" />
@@ -248,7 +258,7 @@ async function onSubmit() {
     </label>
 
     <label>
-      Åbningstider for faciliteter
+      Åbningstider for denne dag
       <textarea
         v-model.trim="form.facilityOpeningHours"
         rows="2"

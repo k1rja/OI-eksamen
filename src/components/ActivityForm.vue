@@ -202,11 +202,6 @@ function onCancel() {
     </label>
 
     <label>
-      Kort intro / beskrivelse
-      <textarea v-model.trim="form.lead" rows="3" />
-    </label>
-
-    <label>
       Dato
       <input type="date" v-model="form.date" />
     </label>
@@ -227,16 +222,21 @@ function onCancel() {
       Lokation
       <input
         v-model.trim="form.location"
-        placeholder="Fx. Havnebadet, Svømmehal Syd"
+        placeholder="Fx. Odense Havnebad, Odense Skøjtehal"
       />
     </label>
 
     <label>
-      Pris (visning)
+      Pris
       <input
         v-model.trim="form.priceText"
         placeholder="Fx. 40 kr., Gratis, 2 klip"
       />
+    </label>
+
+    <label>
+      Beskrivelse
+      <textarea v-model.trim="form.lead" rows="3" />
     </label>
 
     <label>
@@ -258,7 +258,7 @@ function onCancel() {
     </label>
 
     <label>
-      Åbningstider for faciliteter
+      Åbningstider for denne dag
       <textarea
         v-model.trim="form.facilityOpeningHours"
         rows="2"
