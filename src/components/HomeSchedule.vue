@@ -333,14 +333,12 @@ function hasTag (item, tag) {
             </div>
 
             <div class="homeSchedule__cardActions">
-              <!-- Info-popup (både for aktiviteter og hold) -->
               <InfoDialog
                 :item="item"
                 :type-label="activeTab === 'activities' ? 'Aktivitet' : 'Hold'"
                 button-label="Info"
               />
 
-              <!-- For aktiviteter kan du evt. stadig have et link -->
               <a
                 v-if="activeTab === 'activities' && (item.linkPath || item.url)"
                 class="homeSchedule__cardLink"
@@ -349,7 +347,6 @@ function hasTag (item, tag) {
                 Læs mere
               </a>
 
-              <!-- Tilmeld-knap kun på hold -->
               <BookBtn
                 v-if="activeTab === 'events'"
                 :id="item.id"
@@ -490,6 +487,8 @@ function hasTag (item, tag) {
 @use '@/assets/_fonts.scss' as f;
 @use '@/assets/_buttons.scss' as btn;
 
+/* ---------- BASE (MOBILE FIRST) ---------- */
+
 .homeSchedule {
   font-family: f.$font-primary;
   display: grid;
@@ -497,8 +496,8 @@ function hasTag (item, tag) {
   grid-template-areas:
     "info"
     "list";
-  gap: 28px;
-  padding: 40px clamp(1.5rem, 5vw, 70px);
+  gap: 24px;
+  padding: 32px clamp(1.25rem, 4vw, 2rem);
   border-radius: 14px;
 }
 
@@ -524,7 +523,7 @@ function hasTag (item, tag) {
 .homeSchedule__infoText {
   margin: 0 0 18px;
   color: c.$color-primary;
-  line-height: 1.9rem;
+  line-height: 1.7rem;
 }
 
 .homeSchedule__infoBtn {
@@ -554,14 +553,14 @@ function hasTag (item, tag) {
 
 .homeSchedule__tabButtons {
   display: flex;
-  gap: 24px;
+  gap: 16px;
 }
 
 .homeSchedule__tabBtn {
   border: none;
   background: transparent;
   font-family: f.$font-secondary;
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: 8px 0;
   cursor: pointer;
   position: relative;
@@ -585,13 +584,17 @@ function hasTag (item, tag) {
 .homeSchedule__filterBtn {
   border: none;
   background: transparent;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-family: f.$font-secondary;   // samme font som tabs
+  font-size: 0.96rem;                // samme størrelse
+  font-weight: 600;                 // samme vægt som Aktivitet/Hold
+  padding: 8px 0;
   cursor: pointer;
+  position: relative;
   color: #252b45;
 }
 
-/* fejl / empty */
+
+/* fejl / tom liste */
 
 .homeSchedule__error {
   color: #b00020;
@@ -611,7 +614,7 @@ function hasTag (item, tag) {
 .homeSchedule__dayTitle {
   margin: 0;
   font-family: f.$font-secondary;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: c.$color-primary;
 }
@@ -624,12 +627,12 @@ function hasTag (item, tag) {
   gap: 12px;
 }
 
-/* kort */
+/* kort – mobile: én kolonne */
 
 .homeSchedule__card {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   padding: 16px 18px;
   background: c.$color-secondary;
   border-radius: 14px;
@@ -675,39 +678,25 @@ function hasTag (item, tag) {
   background: #eef0ff;
 }
 
-/* allerede i din <style scoped lang="scss"> ... */
-
 .homeSchedule__cardActions {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
-
-/* Gør ALLE knapper inde i actions lige så store som adminBtn */
-.homeSchedule__cardActions :deep(button) {
-  @include btn.button(btn.$button-primary);  // samme mixin som adminBtn
-  font-family: f.$font-primary;
-}
-
-/* INFO-knappen skal være “outline” men beholde størrelse */
-.homeSchedule__cardActions :deep(.infoDialog__btn) {
-  background: c.$color-secondary;
-  color: c.$cta;
-  border: 3px solid c.$cta;
-}
-
 
 .homeSchedule__cardLink {
   text-decoration: none;
   padding: 10px 18px;
   border-radius: 999px;
   background: c.$color-primary;
-  color: white;
+  color: c.$color-secondary;
   font-weight: 700;
   font-size: 0.9rem;
 }
 
-/* filter-modal */
+/* ---------- FILTER-OVERLAY – MOBILE (bottom sheet) ---------- */
 
 .filterModal {
   position: fixed;
@@ -718,21 +707,26 @@ function hasTag (item, tag) {
 .filterModal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
 }
 
+/* mobile: bottom sheet, fuld bredde */
 .filterModal__panel {
   position: absolute;
-  top: 0;
   right: 0;
+  left: 0;
   bottom: 0;
-  width: min(320px, 90vw);
-  background: #fff;
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.18);
-  padding: 20px 20px 16px;
+  background: c.$color-secondary;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-height: 80vh;
+
+  padding: 20px 24px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
 .filterModal__header {
@@ -781,53 +775,97 @@ function hasTag (item, tag) {
 }
 
 .filterModal__footer {
-  margin-top: auto;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: flex-end;
+  flex-wrap: nowrap;  // <— vigtig!
 }
+
+/* knapper = samme form som adminBtn */
 
 .btn {
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 20px;          // MINDRE end før (10px 26px)
+  border-radius: 10px;        // samme form
+  font-size: 0.85rem;         // lidt mindre tekst
+  font-weight: 800;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: 0.2s ease;
+  font-family: f.$font-primary;
+
+  border: 2px solid c.$cta;
+  background: transparent;
+
+  /* gør at NULSTIL + GEM står på række */
+  white-space: nowrap;
 }
 
+/* GEM = orange */
 .btn--primary {
-  border: none;
-  background: c.$color-primary;
-  color: #fff;
+  background: c.$cta;
+  color: c.$color-secondary;
+
+  &:hover {
+    background: c.$color-tertiary;
+    border-color: c.$color-tertiary;
+    transform: translateY(-1px);
+  }
 }
 
+/* NULSTIL = hvid med orange kant (adminBtn--secondary) */
 .btn--ghost {
-  border: 1px solid #d0d4e4;
-  background: #fff;
-  color: #252b45;
+  background: c.$color-secondary;
+  color: c.$cta;
+
+  &:hover:not(:disabled) {
+    border-color: c.$color-tertiary;
+    color: c.$color-tertiary;
+    transform: translateY(-1px);
+  }
 }
 
 .btn--ghost:disabled {
   opacity: 0.4;
   cursor: default;
+  transform: none;
 }
 
-/* responsive */
+/* ---------- BREAKPOINTS (større skærme) ---------- */
 
-@media (max-width: 680px) {
+/* tablet-ish */
+@media (min-width: 680px) {
   .homeSchedule {
-    padding-inline: clamp(1.25rem, 4vw, 2rem);
+    padding: 40px clamp(1.5rem, 5vw, 70px);
   }
 
   .homeSchedule__card {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
   }
 
   .homeSchedule__cardActions {
-    justify-content: flex-start;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  /* filter-modal: lille kort i højre side */
+  .filterModal__panel {
+    top: 150px;
+    right: clamp(16px, 5vw, 70px);
+    left: auto;
+    bottom: auto;
+    width: min(340px, 90vw);
+    max-height: calc(100vh - 260px);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
   }
 }
 
+/* desktop: to kolonner med info + liste */
 @media (min-width: 900px) {
   .homeSchedule {
     grid-template-columns: 0.9fr 1.6fr;
@@ -835,3 +873,4 @@ function hasTag (item, tag) {
   }
 }
 </style>
+

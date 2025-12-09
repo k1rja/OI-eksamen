@@ -266,7 +266,7 @@ onMounted(load)
 /* --- PRIMÆR (orange) – bruges til SLET --- */
 .adminBtn--danger {
   background: c.$cta;
-  color: c.$color-secondary; // hvid
+  color: c.$color-secondary;
 
     &:hover {
         background: c.$color-tertiary;
@@ -317,11 +317,13 @@ onMounted(load)
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #dde1f0;
-  background: #fafbff;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: c.$color-secondary;
+  border: 1px solid #c5c8d3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
+
 
 .calendar__meta {
   font-size: 0.9rem;

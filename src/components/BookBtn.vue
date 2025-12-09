@@ -83,15 +83,15 @@ async function toggleOnServer () {
 
 <template>
   <!-- Primær knap på kortet -->
-    <button
-        type="button"
-        class="adminBtn adminBtn--danger"
-        @click="openConfirm"
-        :disabled="loading || !PATH"
-        >
-        {{ status === 1 ? 'AFMELD' : 'TILMELD' }}
-    </button>
-
+  <button
+    type="button"
+    class="bookBtn"
+    :class="{ 'bookBtn--active': status === 1 }"
+    @click="openConfirm"
+    :disabled="loading || !PATH"
+  >
+    {{ status === 1 ? 'AFMELD' : 'TILMELD' }}
+  </button>
 
   <!-- Bekræftelses-popup -->
   <div
@@ -159,17 +159,38 @@ async function toggleOnServer () {
 @use '../assets/_fonts.scss' as f;
 @use '../assets/_colors.scss' as c;
 
-/* ---------- KORT-KNAP (samme størrelse som adminBtn) ---------- */
+/* ---------- KORT-KNAP (samme størrelse som .adminBtn) ---------- */
 
 .bookBtn {
-  @include btn.button(btn.$button-primary); // samme config som adminBtn
-  font-family: f.$font-primary;
-  border: 0;
+  /* samme form og størrelse som .adminBtn */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 26px;
+  border-radius: 10px;             // matcher .adminBtn
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: 0.2s ease;
+  border: 2px solid c.$cta;
+
+  font-family: f.$font-primary;
+  background: c.$cta;              // orange som adminBtn--danger
+  color: c.$color-secondary;       // hvid tekst
 }
 
+/* når brugeren ER tilmeldt (aktiv knap) */
 .bookBtn--active {
-  background: c.$color-primary;
+  background: c.$color-secondary;  // hvid baggrund
+  color: c.$cta;                   // orange tekst
+}
+
+/* hover-states – samme følelse som adminBtn */
+.bookBtn:hover:not(:disabled) {
+  background: c.$color-tertiary;
+  border-color: c.$color-tertiary;
+  transform: translateY(-1px);
 }
 
 .bookBtn:disabled {

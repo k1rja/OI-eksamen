@@ -285,12 +285,14 @@ onMounted(load)
 .card {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 12px;
-  padding: 12px 14px;
-  background: #fafbff;
-  border-radius: 12px;
-  border: 1px solid #dde1f0;
+  gap: 16px;
+  padding: 16px 18px;
+  background: c.$color-secondary;
+  border-radius: 14px;
+  border: 1px solid #c5c8d3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
+
 
 .card__title {
   font-weight: 700;

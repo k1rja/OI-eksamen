@@ -116,15 +116,30 @@ function onClose() {
 
 /* Lille sekundær knap ved siden af Tilmeld */
 .infoBtn {
-  border-radius: 999px;
-  border: 1px solid c.$cta;
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 700;
+  /* ← samme størrelse & form som .adminBtn */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 10px 26px;        // samme som adminBtn
+  border-radius: 10px;       // samme som adminBtn
+  font-size: 0.95rem;        // samme som adminBtn
+  font-weight: 800;          // samme som adminBtn
   text-transform: uppercase;
+
   cursor: pointer;
-  background: #fff;
+  transition: 0.2s ease;
+
+  /* ← behold farverne du allerede bruger */
+  background: c.$color-secondary;
   color: c.$cta;
+  border: 2px solid c.$cta;  // tykkere for at matche adminBtn-look
+}
+
+.infoBtn:hover:not(:disabled) {
+  border-color: c.$color-tertiary;
+  color: c.$color-tertiary;
+  transform: translateY(-1px);
 }
 
 .infoBtn:disabled {
@@ -133,9 +148,10 @@ function onClose() {
 }
 
 .infoBtn--secondary {
-  background: #fff;
+  background: c.$color-secondary;
   color: c.$cta;
 }
+
 
 /* Overlay */
 .infoModal {
