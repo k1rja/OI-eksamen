@@ -83,21 +83,27 @@ function matchesTagFilters (item) {
   const f = filters.value
   const tags = Array.isArray(item.tags) ? item.tags : []
 
-  const required = []
-  if (f.indoor) required.push('indoor')
-  if (f.outdoor) required.push('outdoor')
-  if (f.highTempo) required.push('highTempo')
-  if (f.lowTempo) required.push('lowTempo')
+  const selected = []
+
+  // fælles tags
+  if (f.indoor) selected.push('indoor')
+  if (f.outdoor) selected.push('outdoor')
+  if (f.highTempo) selected.push('highTempo')
+  if (f.lowTempo) selected.push('lowTempo')
 
   // kun aktiviteter
   if (activeTab.value === 'activities') {
-    if (f.kids) required.push('kids')
-    if (f.family) required.push('family')
+    if (f.kids) selected.push('kids')
+    if (f.family) selected.push('family')
   }
 
-  if (!required.length) return true
-  return required.every(tag => tags.includes(tag))
+  // ingen tag-filtre valgt → alt vises
+  if (!selected.length) return true
+
+  // OR-logik: MINDEST én af de valgte tags skal matche
+  return selected.some(tag => tags.includes(tag))
 }
+
 
 /* dato-filtre */
 

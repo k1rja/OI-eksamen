@@ -97,23 +97,28 @@ function matchesTagFilters (item) {
   const f = filters.value
   const tags = Array.isArray(item.tags) ? item.tags : []
 
-  const required = []
+  const selected = []
 
   // fælles tags
-  if (f.indoor) required.push('indoor')
-  if (f.outdoor) required.push('outdoor')
-  if (f.highTempo) required.push('active') // høj intensitet
-  if (f.lowTempo) required.push('calm')    // roligt tempo
+  if (f.indoor) selected.push('indoor')
+  if (f.outdoor) selected.push('outdoor')
+  if (f.highTempo) selected.push('active') // høj intensitet
+  if (f.lowTempo) selected.push('calm')    // roligt tempo
 
   // kun aktiviteter
   if (activeTab.value === 'activities') {
-    if (f.kids) required.push('kids')
-    if (f.family) required.push('family')
+    if (f.kids) selected.push('kids')
+    if (f.family) selected.push('family')
   }
 
-  if (!required.length) return true
-  return required.every(tag => tags.includes(tag))
+  // ingen tag-filtre valgt → alt er ok
+  if (!selected.length) return true
+
+  // OR-logik: aktiviteten skal have MINDEST ÉN af de valgte tags
+  return selected.some(tag => tags.includes(tag))
 }
+
+
 
 /* Dato-filtre (OR-logik mellem i dag / i morgen / i weekenden) */
 
@@ -327,7 +332,7 @@ function hasTag (item, tag) {
                   Høj intensitet
                 </span>
                 <span v-if="hasTag(item, 'calm')" class="homeSchedule__tag">
-                  Lavt tempo
+                  Roligt tempo
                 </span>
               </div>
             </div>

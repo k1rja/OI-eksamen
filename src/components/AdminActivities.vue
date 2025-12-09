@@ -152,14 +152,14 @@ onMounted(load)
                         v-if="hasTag(act, 'calm') || hasTag(act, 'lowTempo')"
                         class="tag"
                     >
-                        Lavt tempo
+                        Roligt tempo
                     </span>
 
                     <span
                         v-if="hasTag(act, 'active') || hasTag(act, 'highTempo')"
                         class="tag"
                     >
-                        Højt tempo
+                        Høj intensitet
                     </span>
                 </div>
 

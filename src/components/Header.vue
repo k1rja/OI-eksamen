@@ -3,7 +3,7 @@
     import facebookBlue from '@/assets/images/facebook_logo/logo/primary-logo/Facebook_Logo_Primary.webp'
     import odenseIdreatspark from '@/assets/images/ikoner/odense-idreatspark-logo.webp'
     import logIndIkon from '@/assets/images/ikoner/logind-ikon.webp'
-    import dropdownPil from '@/assets/images/ikoner/dropdown_pil.webp'
+    import dropdownPil from '@/assets/images/ikoner/arrow_white.webp'
 
     import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
     import { useRouter } from 'vue-router'
@@ -73,46 +73,38 @@
             <nav class="mobil_nav" ref="mobileNavRef" :class="{ open: isMenuOpen }" @click.stop>
                 <ul class="mobil_nav_ul" @click.stop>
                     <li>
-                        <button @click="toggle(0)">Aktiviteter<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 0 }"></button>
+                        <button @click="toggle(0)">Aktiviteter og hold<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 0 }"></button>
 
                         <ul v-if="activeIndex === 0">
-                            <li><RouterLink to="/aktivitetsoversigt">Aktivitetsoversigt</RouterLink></li>
-                            <li>Foreninger</li>
+                            <li><RouterLink to="/aktivitetsoversigt">Udforsk aktiviteter</RouterLink></li>
+                            <li><RouterLink to="/events">Book aktiviteter og hold</RouterLink></li>
+                            <li><RouterLink to="/foreningsstrength">Foreninger</RouterLink></li>
                         </ul>
                     </li>
 
                     <li>
-                        <button @click="toggle(1)">Booking og priser<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 1 }"></button>
-
-                        <ul v-if="activeIndex === 1">
-                            <li><RouterLink to="/events">Book hold</RouterLink></li>
-                            <li>Book mødelokale</li>
-                            <li>Lej udstyr</li>
-                            <li>Priser og billetter</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <button @click="toggle(2)">Åbningstider og info<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 2 }"></button>
+                        <button @click="toggle(2)">Faciliteter<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 2 }"></button>
 
                         <ul v-if="activeIndex === 2">
-                            <li>Svømmehaller</li>
-                            <li>Idrætshaller</li>
-                            <li>Stadion og Arenaer</li>
-                            <li>Friluftbad</li>
-                            <li>Skøjtehal</li>
+                            <li>Svømmehallen Bolbro</li>
+                            <li>Svømmehallen Højme</li>
+                            <li><RouterLink to="/klodsterbakken">Svømmehallen Klosterbakken</RouterLink></li>
+                            <li>Svømmehallen Universitet</li>
+                            <li>Svømmehallen Vollsmose</li>
+                            <li>Odense Friluftsbad</li>
+                            <li><RouterLink to="/havnebadet">Odense Havnebad</RouterLink></li>
+                            <li>Odense Atletikstadion</li>
+                            <li>Odense Gymnastikhal</li>
+                            <li>Odense Idrætshal (Sydbanl Arena)</li>
+                            <li>Odense Skøjtehal</li>
+                            <li>Odense Stadion (Nature Energy Park)</li>
+                            <li>Thorvald Ellegaard Arena</li>
                         </ul>
 
                     </li>
 
                     <li>
-                        <button @click="toggle(3)">Om os<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 3 }"></button>
-
-                        <ul v-if="activeIndex === 3">
-                            <li>Hvem er vi?</li>
-                            <li>Ledige stillinger</li>
-                            <li>Presse og udvikling</li>
-                        </ul>
+                        <button @click="toggle(3)">Om os<img></button>
                     </li>
 
                     <li>
@@ -191,43 +183,35 @@
                     <button @click="toggle(0)">Aktiviteter<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 0 }"></button>
 
                     <ul v-if="activeIndex === 0">
-                        <li><RouterLink to="/aktivitetsoversigt">Aktivitetsoversigt</RouterLink></li>
-                        <li><RouterLink to="/foreningsstrength">Foreninger</RouterLink></li>
+                            <li><RouterLink to="/aktivitetsoversigt">Udforsk aktiviteter</RouterLink></li>
+                            <li><RouterLink to="/events">Book aktiviteter og hold</RouterLink></li>
+                            <li><RouterLink to="/foreningsstrength">Foreninger</RouterLink></li>
                     </ul>
                 </li>
 
                 <li>
-                    <button @click="toggle(1)">Booking og priser<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 1 }"></button>
-
-                    <ul v-if="activeIndex === 1">
-                        <li><RouterLink to="/events">Book hold</RouterLink></li>
-                        <li>Book mødelokale</li>
-                        <li>Lej udstyr</li>
-                        <li>Priser og billetter</li>
-                    </ul>
-                </li>
-
-                <li>
-                    <button @click="toggle(2)">Åbningstider og info<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 2 }"></button>
+                    <button @click="toggle(2)">Faciliteter<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 2 }"></button>
 
                     <ul v-if="activeIndex === 2">
-                        <li>Svømmehaller</li>
-                        <li>Idrætshaller</li>
-                        <li>Stadion og Arenaer</li>
-                        <li>Friluftbad</li>
-                        <li>Skøjtehal</li>
+                        <li>Svømmehallen Bolbro</li>
+                        <li>Svømmehallen Højme</li>
+                        <li><RouterLink to="/klodsterbakken">Svømmehallen Klosterbakken</RouterLink></li>
+                        <li>Svømmehallen Universitet</li>
+                        <li>Svømmehallen Vollsmose</li>
+                        <li>Odense Friluftsbad</li>
+                        <li><RouterLink to="/havnebadet">Odense Havnebad</RouterLink></li>
+                        <li>Odense Atletikstadion</li>
+                        <li>Odense Gymnastikhal</li>
+                        <li>Odense Idrætshal (Sydbanl Arena)</li>
+                        <li>Odense Skøjtehal</li>
+                        <li>Odense Stadion (Nature Energy Park)</li>
+                        <li>Thorvald Ellegaard Arena</li>
                     </ul>
 
                 </li>
 
                 <li>
-                    <button @click="toggle(3)">Om os<img :src="dropdownPil" alt="dropdown pil" class="dropdown__arrow" :class="{ rotated: activeIndex === 3 }"></button>
-
-                    <ul v-if="activeIndex === 3">
-                        <li><RouterLink to="/omos">Hvem er vi?</RouterLink></li>
-                        <li>Ledige stillinger</li>
-                        <li>Presse og udvikling</li>
-                    </ul>
+                    <button @click="toggle(3)">Om os<img></button>
                 </li>
 
                 <li>
@@ -249,11 +233,13 @@
 }
 
 .dropdown__arrow {
-    width: 14px;
-    height: 14px;
+    width: 14px;          // lidt bredere
+    height: 8px;          // lavere = mindre spids
     margin-left: 8px;
     transition: transform 0.3s ease;
+    object-fit: contain;  // bevar pilens proportioner pænt
 }
+
 
 .dropdown__arrow.rotated {
     transform: rotate(180deg);
@@ -381,139 +367,156 @@
 }
 
 
-
-@media (min-width: 600px) {
-
-}
-
 @media (min-width: 1024px) {
 
     .header_mobil {
-        display: none;
+    display: none;
     }
 
     .top_header {
-        display: flex;
-        margin: 10px 20px;
-        justify-content: space-between;
+    display: flex;
+    margin: 10px 20px;
+    justify-content: space-between;
     }
 
     .bottom_header_nav {
-        width: 100%;
-        height: 35px;
-        background-color: c.$color-primary;
+    width: 100%;
+    height: 35px;
+    background-color: c.$color-primary;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* EKSTRA HORIZONTAL LUFT RUNDT OM ALT */
+    padding: 0.5rem clamp(2rem, 5vw, 4rem);
+
+    .header_nav_ul {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0.5rem 0;
 
-        .header_nav_ul {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            margin: 0;
-            padding: 0;
+        /* MERE LUFT MELLEM MENUPUNKTERNE */
+        gap: clamp(3rem, 6vw, 5rem);
 
-            li {
-                position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
 
-                button {
-                    background: transparent;
-                    border: none;
-                    font-size: 13px;
-                    font-style: normal;
-                    font-weight: 700;
-                    cursor: pointer;
-                    color: c.$color-secondary;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.3rem;
-                    transition: all 0.3s ease;
+        li {
+            position: relative;
 
-                    &:hover {
-                        color: c.$color-tertiary;
-                        transform: translateY(-2px);
-                    }
+            button {
+                background: transparent;
+                border: none;
+                font-size: 13px;
+                font-style: normal;
+                font-weight: 700;
+                cursor: pointer;
+                color: c.$color-secondary;
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                transition: all 0.3s ease;
 
-                    img {
-                        width: 10px;
-                        transition: transform 0.3s ease;
-                    }
-
-                    &.rotated img {
-                        transform: rotate(180deg);
-                    }
+                &:hover {
+                    color: c.$color-tertiary;
+                    transform: translateY(-2px);
                 }
 
-                ul {
-                    list-style: none;
-                    position: absolute;
-                    top: 1.6rem;
-                    left: 0;
-                    background-color: c.$color-secondary;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                    padding: 0.5rem 1rem;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.3rem;
-                    z-index: 2000;
+                img {
+                    width: 10px;
+                    transition: transform 0.3s ease;
+                }
 
-                    li {
-                        color: #210700;
-                        cursor: pointer;
-                        transition: color 0.2s;
-                        margin: 10px;
+                &.rotated img {
+                    transform: rotate(180deg);
+                }
+            }
 
-                        &:hover {
-                            color: c.$color-tertiary;
-                        }
+            /* --- DROPDOWN (desktop) --- */
+            ul {
+                list-style: none;
+                position: absolute;
+                top: 1.6rem;
+                left: 0;
+                background-color: c.$color-secondary;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+                /* bredere dropdown */
+                min-width: 340px;
+                padding: 0.75rem 1.75rem;
+
+                display: flex;
+                flex-direction: column;
+                gap: 0; // styres via li-margin
+                z-index: 2000;
+
+                li {
+                    color: #210700;
+                    cursor: pointer;
+                    transition: color 0.2s;
+
+                    /* mindre afstand mellem punkter */
+                    margin: 2px 0;
+                    font-size: 0.95rem;
+                    line-height: 1.3;
+
+                    a {
+                        color: inherit;
+                        text-decoration: none;
+                    }
+
+                    &:hover,
+                    a:hover {
+                        color: c.$color-tertiary;
                     }
                 }
             }
         }
     }
+}
+
 
     .header_some_img {
-        width: 20px;
-        height: 20px;
-        margin: 10px;
-        margin-top: 25px;
+    width: 20px;
+    height: 20px;
+    margin: 10px;
+    margin-top: 25px;
     }
 
     .header_logo_img {
-        width: 150px;
+    width: 150px;
     }
 
     .actions_img {
-        width: 20px;
-        height: 20px;
-        margin: 10px;
-        margin-top: 25px;
+    width: 20px;
+    height: 20px;
+    margin: 10px;
+    margin-top: 25px;
     }
 
     .top_header_actions {
-        display: flex;
+    display: flex;
     }
 
     .actions_LogInd_p {
-        margin-top: 25px;
-        font-weight: 600;
+    margin-top: 25px;
+    font-weight: 600;
     }
 
     .header_nav_link--kontakt {
-        font-size: 13px;
-        font-weight: 700;
-        color: c.$color-secondary;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
+    font-size: 13px;
+    font-weight: 700;
+    color: c.$color-secondary;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
 
-        &:hover {
-            color: c.$color-tertiary;
-            transform: translateY(-2px);
-        }
+    &:hover {
+        color: c.$color-tertiary;
+        transform: translateY(-2px);
+    }
     }
 }
+
 </style>

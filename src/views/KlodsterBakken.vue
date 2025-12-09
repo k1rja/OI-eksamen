@@ -41,8 +41,8 @@ const winterHours = [
 
   <SectionDarkBlue 
     :image="Klosterbakken"
-    title="Vinter åbningstider"
-    text="Der er lukkede d.25/12 samt d. 1-4 januar"
+    title="Vinteråbningstider"
+    text="Der er lukker d.25/12 samt d. 1/1 til og med 4/1"
   >
     <template #extra>
       <OpenHours :hours="winterHours" />

@@ -57,13 +57,6 @@ function onClose() {
           <h2 class="infoModal__title">
             {{ item.title || (typeLabel === 'Hold' ? 'Hold' : 'Aktivitet') }}
           </h2>
-            <button
-                type="button"
-                class="infoDialog__trigger adminBtn adminBtn--secondary"
-                @click="open = true"
-                >
-                {{ buttonLabel.toUpperCase() }}
-                </button>
         </header>
 
         <div class="infoModal__body">
