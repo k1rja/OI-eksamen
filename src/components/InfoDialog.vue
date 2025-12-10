@@ -1,4 +1,3 @@
-<!-- src/components/InfoDialog.vue -->
 <script setup>
 import { ref, computed } from 'vue'
 

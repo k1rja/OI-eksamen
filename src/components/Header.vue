@@ -95,7 +95,7 @@
                             <li><RouterLink to="/havnebadet">Odense Havnebad</RouterLink></li>
                             <li>Odense Atletikstadion</li>
                             <li>Odense Gymnastikhal</li>
-                            <li>Odense Idrætshal (Sydbanl Arena)</li>
+                            <li>Odense Idrætshal (Sydbank Arena)</li>
                             <li>Odense Skøjtehal</li>
                             <li>Odense Stadion (Nature Energy Park)</li>
                             <li>Thorvald Ellegaard Arena</li>
@@ -202,7 +202,7 @@
                         <li><RouterLink to="/havnebadet">Odense Havnebad</RouterLink></li>
                         <li>Odense Atletikstadion</li>
                         <li>Odense Gymnastikhal</li>
-                        <li>Odense Idrætshal (Sydbanl Arena)</li>
+                        <li>Odense Idrætshal (Sydbank Arena)</li>
                         <li>Odense Skøjtehal</li>
                         <li>Odense Stadion (Nature Energy Park)</li>
                         <li>Thorvald Ellegaard Arena</li>

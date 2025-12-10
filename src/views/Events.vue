@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import BookBtn from '@/components/BookBtn.vue'
 import { eventStartMs, dateKey, weekdayDa, formatDateDa } from '@/utils/date'
 
+
 // Firebase base URL
 const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
 if (!DB_URL) {

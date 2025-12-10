@@ -1,19 +1,18 @@
 <script setup>
 import { ref } from 'vue'
+
 import AdminActivities from '@/components/AdminActivities.vue'
 import AdminEvents from '@/components/AdminEvents.vue'
+import AdminOpeningList from '@/components/AdminOpeningList.vue'
 
-// starter på "events" (Hold). Skift til "activities" hvis du hellere vil starte dér.
-const activeTab = ref('events')  // 'activities' eller 'events'
+const activeTab = ref('events')
 </script>
 
 <template>
   <main class="adminPage">
 
-    <!-- Tabs -->
     <header class="adminTabs">
       <button
-        type="button"
         class="adminTabs__btn"
         :class="{ 'adminTabs__btn--active': activeTab === 'activities' }"
         @click="activeTab = 'activities'"
@@ -22,22 +21,30 @@ const activeTab = ref('events')  // 'activities' eller 'events'
       </button>
 
       <button
-        type="button"
         class="adminTabs__btn"
         :class="{ 'adminTabs__btn--active': activeTab === 'events' }"
         @click="activeTab = 'events'"
       >
         Hold
       </button>
+
+      <button
+        class="adminTabs__btn"
+        :class="{ 'adminTabs__btn--active': activeTab === 'openingchanges' }"
+        @click="activeTab = 'openingchanges'"
+      >
+        Ændrede åbningstider
+      </button>
     </header>
 
-    <!-- Indhold: vi viser KUN det ene komponent ad gangen -->
     <section class="adminPage__content">
       <AdminActivities v-if="activeTab === 'activities'" />
-      <AdminEvents v-else />
+      <AdminEvents v-else-if="activeTab === 'events'" />
+      <AdminOpeningList v-else />
     </section>
   </main>
 </template>
+
 
 <style scoped lang="scss">
 @use '../assets/_colors.scss' as c;
@@ -54,7 +61,7 @@ const activeTab = ref('events')  // 'activities' eller 'events'
   margin: 0;
 }
 
-/* Tabs-linje – må ikke ligne knapper */
+/* Tabs-linje */
 .adminTabs {
   display: flex;
   gap: 24px;
