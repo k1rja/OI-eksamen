@@ -4,7 +4,7 @@ import OpeningChangesForm from "@/components/OpeningChangesForm.vue";
 import {
   listenOpeningChanges,
   getFacilityNameById,
-  deleteOpeningChange
+  deleteOpeningChange,
 } from "@/stores/openingHoursStore";
 
 const changes = ref([]);
@@ -43,8 +43,6 @@ function formatTime(c) {
 
 function startEdit(change) {
   editingChange.value = { ...change };
-  // scrolle op til formular, hvis man vil være ekstra sød: optional
-  // window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function handleDelete(change) {
@@ -116,17 +114,17 @@ function handleUpdated() {
           <div class="adminOpening__actions">
             <button
               type="button"
-              class="adminOpening__btn adminOpening__btn--edit"
+              class="adminBtn adminBtn--secondary"
               @click="startEdit(c)"
             >
-              Rediger
+              REDIGÉR
             </button>
             <button
               type="button"
-              class="adminOpening__btn adminOpening__btn--delete"
+              class="adminBtn adminBtn--danger"
               @click="handleDelete(c)"
             >
-              Slet
+              SLET
             </button>
           </div>
         </li>
@@ -161,6 +159,8 @@ function handleUpdated() {
   margin: 0 0 8px;
 }
 
+/* LISTE + KORT – matcher adminActivities */
+
 .adminOpening__list {
   list-style: none;
   padding: 0;
@@ -170,18 +170,19 @@ function handleUpdated() {
 }
 
 .adminOpening__item {
-  padding: 12px 14px;
-  background: #f9f9f9;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 16px 18px;
+  background: c.$color-secondary;         /* samme som .card i AdminActivities */
+  border-radius: 14px;
+  border: 1px solid #c5c8d3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
   display: grid;
   gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .adminOpening__itemMain {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .adminOpening__facility {
@@ -208,28 +209,51 @@ function handleUpdated() {
 
 .adminOpening__actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
 }
 
-.adminOpening__btn {
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.85rem;
+/* --- ADMIN KNAPPER: samme som i AdminActivities --- */
+
+.adminBtn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 26px;
+  border-radius: 10px;
+  min-width:140px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
   cursor: pointer;
-  border: 1px solid transparent;
+  transition: 0.2s ease;
+  border: 2px solid c.$cta;
 }
 
-.adminOpening__btn--edit {
-  background: c.$color-primary;
-  color: #fff;
+/* Primær (orange) – SLET */
+.adminBtn--danger {
+  background: c.$cta;
+  color: c.$color-secondary;
+
+  &:hover {
+    background: c.$color-tertiary;
+    border-color: c.$color-tertiary;
+    transform: translateY(-1px);
+  }
 }
 
-.adminOpening__btn--delete {
-  background: #fff;
-  color: #b00020;
-  border-color: #b00020;
+/* Sekundær (hvid med orange kant) – REDIGER */
+.adminBtn--secondary {
+  background: #fefffe;
+  border: 3px solid c.$cta;
+  color: c.$cta;
+
+  &:hover {
+    border-color: c.$color-tertiary;
+    color: c.$color-tertiary;
+    transform: translateY(-1px);
+  }
 }
 
 .adminOpening__error {
