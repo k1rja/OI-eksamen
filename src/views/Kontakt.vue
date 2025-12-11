@@ -1,11 +1,11 @@
 <script setup>
-import KontaktInfo from '@/components/KontaktInfo.vue'
+    import KontaktInfo from '@/components/KontaktInfo.vue'
 
-import Mail from '@/assets/images/ikoner/mail.webp'
-import Mobil from '@/assets/images/ikoner/mobil.webp'
-import Lokation from '@/assets/images/ikoner/placering.webp'
-import Ur from '@/assets/images/ikoner/tid.webp'
-import KontaktFormular from './KontaktFormular.vue'
+    import Mail from '@/assets/images/ikoner/mail.webp'
+    import Mobil from '@/assets/images/ikoner/mobil.webp'
+    import Lokation from '@/assets/images/ikoner/placering.webp'
+    import Ur from '@/assets/images/ikoner/tid.webp'
+    import KontaktFormular from './KontaktFormular.vue'
 
 </script>
 
@@ -214,84 +214,84 @@ import KontaktFormular from './KontaktFormular.vue'
 </template>
 
 <style lang="scss">
-@use '../assets/_colors.scss' as c;
-@use '../assets/_fonts.scss' as f;
-@use '../assets/_buttons.scss' as b;
-
-.kontakt_content {
-    margin-left: 20px;
-    margin-right: 20px;
-    color: c.$color-primary;
-}
-
-h2 {
-    font-weight: 900;
-    margin-bottom: 20px;
-}
-
-h3 {
-    margin-bottom: 20px;
-}
-
-.p_content {
-    margin-bottom: 20px;
-    margin-left: 5px;
-}
-
-.content_left_info {
-    margin-top: 70px;
-    margin-left: 0px;
-}
-
-.content_right_info {
-    margin-top: 70px;
-    margin-left: 0px;
-}
-
-.right_info_ledere {
-    margin-top: 70px;
-}
-
-.right_info_ledere1 {
-    margin-top: 20px;
-}
-
-.right_kontakt_formular {
-    margin-top: 70px;
-    margin-bottom: 40px;
-}
-
-.kontakt_formular_p {
-    margin-bottom: 20px;
-}
-
-@media (min-width: 1024px) {
+    @use '../assets/_colors.scss' as c;
+    @use '../assets/_fonts.scss' as f;
+    @use '../assets/_buttons.scss' as b;
 
     .kontakt_content {
-        display: flex;
+        margin-left: 20px;
+        margin-right: 20px;
+        color: c.$color-primary;
     }
 
-    .content_left {
-        width: 50%;
-        margin: 0px 100px 0px 60px;
+    h2 {
+        font-weight: 900;
+        margin-bottom: 20px;
     }
 
-    .content_right {
-        width: 50%;
-        margin: 0px 60px 40px 100px;
+    h3 {
+        margin-bottom: 20px;
+    }
+
+    .p_content {
+        margin-bottom: 20px;
+        margin-left: 5px;
     }
 
     .content_left_info {
-        margin-bottom: 70px;
+        margin-top: 70px;
+        margin-left: 0px;
+    }
+
+    .content_right_info {
+        margin-top: 70px;
+        margin-left: 0px;
     }
 
     .right_info_ledere {
-        margin-bottom: 70px;
+        margin-top: 70px;
     }
 
     .right_info_ledere1 {
-        margin-bottom: 70px;
+        margin-top: 20px;
     }
 
-}
+    .right_kontakt_formular {
+        margin-top: 70px;
+        margin-bottom: 40px;
+    }
+
+    .kontakt_formular_p {
+        margin-bottom: 20px;
+    }
+
+    @media (min-width: 1024px) {
+
+        .kontakt_content {
+            display: flex;
+        }
+
+        .content_left {
+            width: 50%;
+            margin: 0px 100px 0px 60px;
+        }
+
+        .content_right {
+            width: 50%;
+            margin: 0px 60px 40px 100px;
+        }
+
+        .content_left_info {
+            margin-bottom: 70px;
+        }
+
+        .right_info_ledere {
+            margin-bottom: 70px;
+        }
+
+        .right_info_ledere1 {
+            margin-bottom: 70px;
+        }
+
+    }
 </style>

@@ -1,10 +1,10 @@
 <script setup>
-const props = defineProps({
-  activity: {
-    type: Object,
-    required: true
-  }
-})
+  const props = defineProps({
+    activity: {
+      type: Object,
+      required: true
+    }
+  })
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const props = defineProps({
       <header class="activity-card__header">
         <h3 class="activity-card__title">{{ activity.title }}</h3>
         <p class="activity-card__location" v-if="activity.location">
-          📍 {{ activity.location }}
+          {{ activity.location }}
         </p>
       </header>
   
@@ -53,9 +53,12 @@ const props = defineProps({
     </article>
   </template>
   
-  <style scoped>
+<style scoped lang="scss">
+  @use '../assets/_colors.scss' as c;
+  @use '../assets/_fonts.scss' as f;
+  
   .activity-card {
-    background: #fff;
+    background: c.$color-secondary;
     border-radius: 1rem;
     padding: 1rem 1rem 0.8rem;
     box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07);
@@ -110,12 +113,12 @@ const props = defineProps({
   
   .activity-card__badge--open {
     background: #16a34a;
-    color: #fff;
+    color: c.$color-secondary;
   }
   
   .activity-card__badge--closed {
     background: #9ca3af;
-    color: #fff;
+    color: c.$color-secondary;
   }
   
   .activity-card__footer {
@@ -135,7 +138,7 @@ const props = defineProps({
   
   .activity-card__button--primary {
     background: #0050b3;
-    color: #fff;
+    color: c.$color-secondary;
   }
   
   .activity-card__button--secondary {
@@ -143,4 +146,4 @@ const props = defineProps({
     color: #0050b3;
     border-color: #0050b3;
   }
-  </style>
+</style>

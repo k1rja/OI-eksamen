@@ -1,4 +1,4 @@
- <script setup>
+<script setup>
   import { reactive, watch } from 'vue'
   
   const props = defineProps({
@@ -38,7 +38,7 @@
     },
     { deep: true }
   )
-  </script>
+</script>
   <template>
     <section class="filter-bar">
       <h2 class="filter-bar__title">Vælg hvad der passer til jer</h2>

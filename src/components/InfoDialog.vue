@@ -1,36 +1,36 @@
 <script setup>
-import { ref, computed } from 'vue'
+  import { ref, computed } from 'vue'
 
-const props = defineProps({
-  // Aktivitet eller hold-objekt
-  item: { type: Object, required: true },
-  // Bruges i teksten: "Om holdet" / "Om aktiviteten"
-  typeLabel: { type: String, default: 'Hold' },
-  // Tekst på knappen
-  buttonLabel: { type: String, default: 'Info' },
-})
+  const props = defineProps({
+    // Aktivitet eller hold-objekt
+    item: { type: Object, required: true },
+    // Bruges i teksten: "Om holdet" / "Om aktiviteten"
+    typeLabel: { type: String, default: 'Hold' },
+    // Tekst på knappen
+    buttonLabel: { type: String, default: 'Info' },
+  })
 
-const open = ref(false)
+  const open = ref(false)
 
-const hasAnyExtraInfo = computed(() => {
-  const it = props.item || {}
-  return (
-    it.description ||
-    it.lead ||
-    it.infoText ||
-    it.whatToBring ||
-    it.facilityOpeningHours
-  )
-})
+  const hasAnyExtraInfo = computed(() => {
+    const it = props.item || {}
+    return (
+      it.description ||
+      it.lead ||
+      it.infoText ||
+      it.whatToBring ||
+      it.facilityOpeningHours
+    )
+  })
 
-function onOpen() {
-  if (!hasAnyExtraInfo.value) return
-  open.value = true
-}
+  function onOpen() {
+    if (!hasAnyExtraInfo.value) return
+    open.value = true
+  }
 
-function onClose() {
-  open.value = false
-}
+  function onClose() {
+    open.value = false
+  }
 </script>
 
 <template>
@@ -104,117 +104,112 @@ function onClose() {
 </template>
 
 <style scoped lang="scss">
-@use '../assets/_colors.scss' as c;
+  @use '../assets/_colors.scss' as c;
 
-/* Lille sekundær knap ved siden af Tilmeld */
-.infoBtn {
-  /* ← samme størrelse & form som .adminBtn */
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  .infoBtn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 26px;      
+    border-radius: 10px;     
+    font-size: 0.95rem;        
+    font-weight: 800;        
+    text-transform: uppercase;
 
-  padding: 10px 26px;        // samme som adminBtn
-  border-radius: 10px;       // samme som adminBtn
-  font-size: 0.95rem;        // samme som adminBtn
-  font-weight: 800;          // samme som adminBtn
-  text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: c.$color-secondary;
+    color: c.$cta;
+    border: 2px solid c.$cta; 
+  }
 
-  cursor: pointer;
-  transition: 0.2s ease;
+  .infoBtn:hover:not(:disabled) {
+    border-color: c.$color-tertiary;
+    color: c.$color-tertiary;
+    transform: translateY(-1px);
+  }
 
-  /* ← behold farverne du allerede bruger */
-  background: c.$color-secondary;
-  color: c.$cta;
-  border: 2px solid c.$cta;  // tykkere for at matche adminBtn-look
-}
+  .infoBtn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
 
-.infoBtn:hover:not(:disabled) {
-  border-color: c.$color-tertiary;
-  color: c.$color-tertiary;
-  transform: translateY(-1px);
-}
-
-.infoBtn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.infoBtn--secondary {
-  background: c.$color-secondary;
-  color: c.$cta;
-}
+  .infoBtn--secondary {
+    background: c.$color-secondary;
+    color: c.$cta;
+  }
 
 
-/* Overlay */
-.infoModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
+  /* Overlay */
+  .infoModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
 
-/* Selve boksen */
-.infoModal__dialog {
-  background: #fff;
-  border-radius: 16px;
-  max-width: 520px;
-  width: 100%;
-  padding: 18px 20px 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
+  /* Selve boksen */
+  .infoModal__dialog {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    padding: 18px 20px 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
 
-.infoModal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
+  .infoModal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
 
-.infoModal__title {
-  font-size: 1.2rem;
-  margin: 0;
-}
+  .infoModal__title {
+    font-size: 1.2rem;
+    margin: 0;
+  }
 
-.infoModal__close {
-  border: none;
-  background: transparent;
-  font-size: 1.6rem;
-  cursor: pointer;
-  line-height: 1;
-}
+  .infoModal__close {
+    border: none;
+    background: transparent;
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+  }
 
-.infoModal__body {
-  font-size: 0.95rem;
-  max-height: 60vh;
-  overflow-y: auto;
-}
+  .infoModal__body {
+    font-size: 0.95rem;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
 
-.infoModal__meta {
-  font-size: 0.85rem;
-  color: #555;
-  margin-bottom: 10px;
-}
+  .infoModal__meta {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 10px;
+  }
 
-.infoSection + .infoSection {
-  margin-top: 10px;
-}
+  .infoSection + .infoSection {
+    margin-top: 10px;
+  }
 
-.infoSection h3 {
-  font-size: 0.95rem;
-  margin: 0 0 2px;
-}
+  .infoSection h3 {
+    font-size: 0.95rem;
+    margin: 0 0 2px;
+  }
 
-.infoSection p {
-  margin: 0;
-}
+  .infoSection p {
+    margin: 0;
+  }
 
-.infoModal__footer {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-}
+  .infoModal__footer {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+  }
 </style>

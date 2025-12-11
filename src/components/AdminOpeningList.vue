@@ -1,78 +1,117 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import OpeningChangesForm from "@/components/OpeningChangesForm.vue";
-import {
-  listenOpeningChanges,
-  getFacilityNameById,
-  deleteOpeningChange,
-} from "@/stores/openingHoursStore";
-
-const changes = ref([]);
-const unsubscribeFn = ref(null);
-const editingChange = ref(null);
-const error = ref("");
-
-onMounted(() => {
-  const unsub = listenOpeningChanges((all) => {
-    changes.value = all;
+  import { ref, onMounted, onUnmounted } from "vue";
+  import OpeningChangesForm from "@/components/OpeningChangesForm.vue";
+  import {
+    listenOpeningChanges,
+    getFacilityNameById,
+    deleteOpeningChange,
+  } from "@/stores/openingHoursStore";
+  import { formatDateDa } from "@/utils/date";
+  
+  const changes = ref([]);
+  const unsubscribeFn = ref(null);
+  const editingChange = ref(null);
+  const error = ref("");
+  
+  // --- NYT: modal-state til slet ---
+  const showConfirm = ref(false);
+  const confirmTarget = ref(null); // den ændring, der skal slettes
+  
+  onMounted(() => {
+    const unsub = listenOpeningChanges((all) => {
+      changes.value = all;
+    });
+    unsubscribeFn.value = unsub;
   });
-  unsubscribeFn.value = unsub;
-});
-
-onUnmounted(() => {
-  if (unsubscribeFn.value) unsubscribeFn.value();
-});
-
-function formatDateRange(c) {
-  if (c.dateTo && c.dateTo !== c.dateFrom) return `${c.dateFrom} – ${c.dateTo}`;
-  return c.dateFrom;
-}
-
-function formatTime(c) {
-  const hasClock = c.timeFrom || c.timeTo;
-  const span = hasClock ? `${c.timeFrom || "?"} – ${c.timeTo || "?"}` : "";
-
-  if (c.isClosed) {
-    if (!hasClock) return "Lukket hele dagen";
-    return `Lukket ${span}`;
+  
+  onUnmounted(() => {
+    if (unsubscribeFn.value) unsubscribeFn.value();
+  });
+  
+  function formatDateRange(c) {
+    const from = formatDateDa(c.dateFrom);
+    const to = formatDateDa(c.dateTo);
+  
+    if (c.dateTo && c.dateTo !== c.dateFrom) return `${from} – ${to}`;
+    return from;
   }
-
-  if (!hasClock) return "";
-  return `Kl. ${span}`;
-}
-
-function startEdit(change) {
-  editingChange.value = { ...change };
-}
-
-async function handleDelete(change) {
-  const ok = window.confirm(
-    `Er du sikker på, at du vil slette ændringen for ${getFacilityNameById(
-      change.facilityId
-    )}?`
-  );
-  if (!ok) return;
+  
+  function formatTime(c) {
+    const hasClock = c.timeFrom || c.timeTo;
+    const span = hasClock ? `${c.timeFrom || "?"} – ${c.timeTo || "?"}` : "";
+  
+    if (c.isClosed) {
+      if (!hasClock) return "Lukket hele dagen";
+      return `Lukket ${span}`;
+    }
+  
+    if (!hasClock) return "";
+    return `Kl. ${span}`;
+  }
+  
+  function startEdit(change) {
+    editingChange.value = { ...change };
+  }
+  
+  // --- NYT: åbn modal i stedet for window.confirm ---
+  function handleDelete(change) {
+    confirmTarget.value = change;
+    showConfirm.value = true;
+  }
+  
+  function closeConfirm() {
+    showConfirm.value = false;
+    confirmTarget.value = null;
+  }
+  
+  async function confirmDeleteNow() {
+  if (!confirmTarget.value) return;
 
   error.value = "";
   try {
-    await deleteOpeningChange(change.id);
-    if (editingChange.value && editingChange.value.id === change.id) {
+    await deleteOpeningChange(confirmTarget.value.id);
+
+    // 🔥 fjern fra listen med det samme
+    changes.value = changes.value.filter(
+      c => c.id !== confirmTarget.value.id
+    );
+
+    if (editingChange.value && editingChange.value.id === confirmTarget.value.id) {
       editingChange.value = null;
     }
   } catch (e) {
     console.error(e);
     error.value = "Kunne ikke slette ændringen.";
+  } finally {
+    closeConfirm();
   }
 }
 
-function handleCreated() {
+
+function handleCreated(newChange) {
   editingChange.value = null;
+
+  // 🔥 læg den nye ændring i listen med det samme
+  if (newChange) {
+    changes.value.push(newChange);
+  }
 }
 
-function handleUpdated() {
+function handleUpdated(updatedChange) {
   editingChange.value = null;
+
+  if (!updatedChange) return;
+
+  const i = changes.value.findIndex(c => c.id === updatedChange.id);
+  if (i !== -1) {
+    // 🔥 erstat eksisterende item i listen
+    changes.value[i] = updatedChange;
+  }
 }
-</script>
+
+  </script>
+  
+
 
 <template>
   <section class="adminOpening">
@@ -134,6 +173,43 @@ function handleUpdated() {
         </li>
       </ul>
     </div>
+        <!-- BEKRÆFTELSES-MODAL FOR ÅBNINGSTIDER -->
+    <div v-if="showConfirm" class="adminModal">
+      <div class="adminModal__backdrop" @click="closeConfirm" />
+
+      <div class="adminModal__panel" role="dialog" aria-modal="true">
+        <h3 class="adminModal__title">
+          Bekræft sletning
+        </h3>
+
+        <p class="adminModal__text">
+          Er du sikker på, at du vil slette ændringen for
+          <strong>
+            {{ confirmTarget && getFacilityNameById(confirmTarget.facilityId) }}
+          </strong>
+          ?
+        </p>
+
+        <div class="adminModal__actions">
+          <button
+            type="button"
+            class="adminBtn adminBtn--secondary"
+            @click="closeConfirm"
+          >
+            Annuller
+          </button>
+
+          <button
+            type="button"
+            class="adminBtn adminBtn--danger"
+            @click="confirmDeleteNow"
+          >
+            Slet
+          </button>
+        </div>
+      </div>
+    </div>
+
   </section>
 </template>
 
@@ -261,4 +337,60 @@ function handleUpdated() {
   font-size: 0.9rem;
   margin-bottom: 6px;
 }
+
+/* ---------- ADMIN CONFIRM-MODAL (samme look som i AdminEvents) ---------- */
+
+.adminModal {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+}
+
+.adminModal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .35);
+}
+
+.adminModal__panel {
+  position: relative;
+  width: min(640px, 92vw);
+  background: c.$color-secondary;
+  border-radius: 14px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, .25),
+    0 2px 6px rgba(0, 0, 0, .15);
+  padding: 50px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.adminModal__title {
+  font-family: f.$font-secondary;
+  color: c.$color-primary;
+  font-weight: 600;
+  font-size: clamp(24px, 3.2vw, 40px);
+  line-height: 1.1;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.adminModal__text {
+  color: c.$color-primary;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.adminModal__actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
 </style>

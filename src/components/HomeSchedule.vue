@@ -1,215 +1,215 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import BookBtn from '@/components/BookBtn.vue'
-import InfoDialog from '@/components/InfoDialog.vue'
-import { eventStartMs, dateKey, weekdayDa, formatDateDa } from '@/utils/date'
+  import { ref, computed, onMounted } from 'vue'
+  import BookBtn from '@/components/BookBtn.vue'
+  import InfoDialog from '@/components/InfoDialog.vue'
+  import { eventStartMs, dateKey, weekdayDa, formatDateDa } from '@/utils/date'
 
-// Firebase base URL
-const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
-if (!DB_URL) {
-  console.error('Mangler VITE_FIREBASE_DATABASE_URL i .env')
-}
-
-// hvilken tab er aktiv: 'activities' eller 'events'
-const activeTab = ref('activities')
-
-// vis / skjul filter-boks
-const showFilter = ref(false)
-
-const events = ref([])      // hold
-const activities = ref([])  // aktiviteter
-const loading = ref(false)
-const error = ref('')
-
-// filter-state
-const filters = ref({
-  kids: false,       // Børnevenligt (kun aktiviteter)
-  family: false,     // Familievenligt (kun aktiviteter)
-  indoor: false,
-  outdoor: false,
-  highTempo: false,  // maps til tag 'active'
-  lowTempo: false,   // maps til tag 'calm'
-  today: false,
-  tomorrow: false,
-  weekend: false,
-})
-
-onMounted(() => {
-  loadAll()
-})
-
-async function loadAll () {
-  if (!DB_URL) return
-  loading.value = true
-  error.value = ''
-
-  try {
-    const [eventsRes, activitiesRes] = await Promise.all([
-      fetch(`${DB_URL}/events.json`),
-      fetch(`${DB_URL}/activities.json`),
-    ])
-
-    if (!eventsRes.ok || !activitiesRes.ok) {
-      throw new Error('HTTP-fejl ved hentning af data')
-    }
-
-    const rawEvents = (await eventsRes.json()) || {}
-    const rawActivities = (await activitiesRes.json()) || {}
-
-    events.value = Object.entries(rawEvents)
-      .map(([id, v]) => (v ? { id, ...v } : null))
-      .filter(Boolean)
-
-    activities.value = Object.entries(rawActivities)
-      .map(([id, v]) => (v ? { id, ...v } : null))
-      .filter(Boolean)
-  } catch (e) {
-    console.error(e)
-    error.value = 'Kunne ikke hente aktiviteter og hold.'
-  } finally {
-    loading.value = false
+  // Firebase base URL
+  const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
+  if (!DB_URL) {
+    console.error('Mangler VITE_FIREBASE_DATABASE_URL i .env')
   }
-}
 
-/* ---------- helpers til filtrering ---------- */
+  // hvilken tab er aktiv: 'activities' eller 'events'
+  const activeTab = ref('activities')
 
-const hasAnyFilter = computed(() =>
-  Object.values(filters.value).some(Boolean)
-)
+  // vis / skjul filter-boks
+  const showFilter = ref(false)
 
-function resetFilters () {
-  Object.keys(filters.value).forEach(k => {
-    filters.value[k] = false
+  const events = ref([])      // hold
+  const activities = ref([])  // aktiviteter
+  const loading = ref(false)
+  const error = ref('')
+
+  // filter-state
+  const filters = ref({
+    kids: false,       // Børnevenligt (kun aktiviteter)
+    family: false,     // Familievenligt (kun aktiviteter)
+    indoor: false,
+    outdoor: false,
+    highTempo: false,  // maps til tag 'active'
+    lowTempo: false,   // maps til tag 'calm'
+    today: false,
+    tomorrow: false,
+    weekend: false,
   })
-}
 
-function closeFilter () {
-  showFilter.value = false
-}
+  onMounted(() => {
+    loadAll()
+  })
 
-function toggleTab (tab) {
-  activeTab.value = tab
-}
+  async function loadAll () {
+    if (!DB_URL) return
+    loading.value = true
+    error.value = ''
 
-/* TAG-fitre (AND-logik) */
+    try {
+      const [eventsRes, activitiesRes] = await Promise.all([
+        fetch(`${DB_URL}/events.json`),
+        fetch(`${DB_URL}/activities.json`),
+      ])
 
-function matchesTagFilters (item) {
-  const f = filters.value
-  const tags = Array.isArray(item.tags) ? item.tags : []
+      if (!eventsRes.ok || !activitiesRes.ok) {
+        throw new Error('HTTP-fejl ved hentning af data')
+      }
 
-  const selected = []
+      const rawEvents = (await eventsRes.json()) || {}
+      const rawActivities = (await activitiesRes.json()) || {}
 
-  // fælles tags
-  if (f.indoor) selected.push('indoor')
-  if (f.outdoor) selected.push('outdoor')
-  if (f.highTempo) selected.push('active') // høj intensitet
-  if (f.lowTempo) selected.push('calm')    // roligt tempo
+      events.value = Object.entries(rawEvents)
+        .map(([id, v]) => (v ? { id, ...v } : null))
+        .filter(Boolean)
 
-  // kun aktiviteter
-  if (activeTab.value === 'activities') {
-    if (f.kids) selected.push('kids')
-    if (f.family) selected.push('family')
-  }
-
-  // ingen tag-filtre valgt → alt er ok
-  if (!selected.length) return true
-
-  // OR-logik: aktiviteten skal have MINDEST ÉN af de valgte tags
-  return selected.some(tag => tags.includes(tag))
-}
-
-
-
-/* Dato-filtre (OR-logik mellem i dag / i morgen / i weekenden) */
-
-function parseDateStr (s) {
-  if (!s) return null
-  const [y, m, d] = s.split('-').map(Number)
-  if (!y || !m || !d) return null
-  return new Date(y, m - 1, d)
-}
-
-function stripTime (d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
-}
-
-function isToday (d) {
-  const today = stripTime(new Date())
-  return stripTime(d).getTime() === today.getTime()
-}
-
-function isTomorrow (d) {
-  const t = new Date()
-  t.setDate(t.getDate() + 1)
-  const tomorrow = stripTime(t)
-  return stripTime(d).getTime() === tomorrow.getTime()
-}
-
-function isWeekend (d) {
-  const day = d.getDay() // 0 = søndag, 6 = lørdag
-  return day === 0 || day === 6
-}
-
-function matchesDateFilters (item) {
-  const f = filters.value
-  const anyDateFilter = f.today || f.tomorrow || f.weekend
-  if (!anyDateFilter) return true
-
-  const d = parseDateStr(item.date)
-  if (!d) return false
-
-  let ok = false
-  if (f.today && isToday(d)) ok = true
-  if (f.tomorrow && isTomorrow(d)) ok = true
-  if (f.weekend && isWeekend(d)) ok = true
-  return ok
-}
-
-/* samlet filtrering + sortering */
-
-const sortedActivities = computed(() =>
-  [...activities.value].sort((a, b) => eventStartMs(a) - eventStartMs(b))
-)
-
-const sortedEvents = computed(() =>
-  [...events.value].sort((a, b) => eventStartMs(a) - eventStartMs(b))
-)
-
-const filteredItems = computed(() => {
-  const list =
-    activeTab.value === 'activities' ? sortedActivities.value : sortedEvents.value
-
-  return list.filter(item => matchesTagFilters(item) && matchesDateFilters(item))
-})
-
-/* gruppering pr. dag */
-
-function buildGroups (list) {
-  const map = new Map()
-
-  for (const ev of list) {
-    const key = dateKey(ev)
-    if (!map.has(key)) {
-      const wd = ev?.date ? weekdayDa(ev.date) : ''
-      const title = ev?.date
-        ? `${wd.charAt(0).toUpperCase()}${wd.slice(1)} ${formatDateDa(ev.date)}`
-        : 'Uden dato'
-      map.set(key, { day: title, items: [] })
+      activities.value = Object.entries(rawActivities)
+        .map(([id, v]) => (v ? { id, ...v } : null))
+        .filter(Boolean)
+    } catch (e) {
+      console.error(e)
+      error.value = 'Kunne ikke hente aktiviteter og hold.'
+    } finally {
+      loading.value = false
     }
-    map.get(key).items.push(ev)
   }
 
-  return [...map.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([, g]) => g)
-}
+  /* ---------- helpers til filtrering ---------- */
 
-const groups = computed(() => buildGroups(filteredItems.value))
+  const hasAnyFilter = computed(() =>
+    Object.values(filters.value).some(Boolean)
+  )
 
-// lille helper til badges i kortene
-function hasTag (item, tag) {
-  return Array.isArray(item.tags) && item.tags.includes(tag)
-}
+  function resetFilters () {
+    Object.keys(filters.value).forEach(k => {
+      filters.value[k] = false
+    })
+  }
+
+  function closeFilter () {
+    showFilter.value = false
+  }
+
+  function toggleTab (tab) {
+    activeTab.value = tab
+  }
+
+  /* TAG-fitre (AND-logik) */
+
+  function matchesTagFilters (item) {
+    const f = filters.value
+    const tags = Array.isArray(item.tags) ? item.tags : []
+
+    const selected = []
+
+    // fælles tags
+    if (f.indoor) selected.push('indoor')
+    if (f.outdoor) selected.push('outdoor')
+    if (f.highTempo) selected.push('active') // høj intensitet
+    if (f.lowTempo) selected.push('calm')    // roligt tempo
+
+    // kun aktiviteter
+    if (activeTab.value === 'activities') {
+      if (f.kids) selected.push('kids')
+      if (f.family) selected.push('family')
+    }
+
+    // ingen tag-filtre valgt → alt er ok
+    if (!selected.length) return true
+
+    // OR-logik: aktiviteten skal have MINDEST ÉN af de valgte tags
+    return selected.some(tag => tags.includes(tag))
+  }
+
+
+
+  /* Dato-filtre (OR-logik mellem i dag / i morgen / i weekenden) */
+
+  function parseDateStr (s) {
+    if (!s) return null
+    const [y, m, d] = s.split('-').map(Number)
+    if (!y || !m || !d) return null
+    return new Date(y, m - 1, d)
+  }
+
+  function stripTime (d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  }
+
+  function isToday (d) {
+    const today = stripTime(new Date())
+    return stripTime(d).getTime() === today.getTime()
+  }
+
+  function isTomorrow (d) {
+    const t = new Date()
+    t.setDate(t.getDate() + 1)
+    const tomorrow = stripTime(t)
+    return stripTime(d).getTime() === tomorrow.getTime()
+  }
+
+  function isWeekend (d) {
+    const day = d.getDay() // 0 = søndag, 6 = lørdag
+    return day === 0 || day === 6
+  }
+
+  function matchesDateFilters (item) {
+    const f = filters.value
+    const anyDateFilter = f.today || f.tomorrow || f.weekend
+    if (!anyDateFilter) return true
+
+    const d = parseDateStr(item.date)
+    if (!d) return false
+
+    let ok = false
+    if (f.today && isToday(d)) ok = true
+    if (f.tomorrow && isTomorrow(d)) ok = true
+    if (f.weekend && isWeekend(d)) ok = true
+    return ok
+  }
+
+  /* samlet filtrering + sortering */
+
+  const sortedActivities = computed(() =>
+    [...activities.value].sort((a, b) => eventStartMs(a) - eventStartMs(b))
+  )
+
+  const sortedEvents = computed(() =>
+    [...events.value].sort((a, b) => eventStartMs(a) - eventStartMs(b))
+  )
+
+  const filteredItems = computed(() => {
+    const list =
+      activeTab.value === 'activities' ? sortedActivities.value : sortedEvents.value
+
+    return list.filter(item => matchesTagFilters(item) && matchesDateFilters(item))
+  })
+
+  /* gruppering pr. dag */
+
+  function buildGroups (list) {
+    const map = new Map()
+
+    for (const ev of list) {
+      const key = dateKey(ev)
+      if (!map.has(key)) {
+        const wd = ev?.date ? weekdayDa(ev.date) : ''
+        const title = ev?.date
+          ? `${wd.charAt(0).toUpperCase()}${wd.slice(1)} ${formatDateDa(ev.date)}`
+          : 'Uden dato'
+        map.set(key, { day: title, items: [] })
+      }
+      map.get(key).items.push(ev)
+    }
+
+    return [...map.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([, g]) => g)
+  }
+
+  const groups = computed(() => buildGroups(filteredItems.value))
+
+  // lille helper til badges i kortene
+  function hasTag (item, tag) {
+    return Array.isArray(item.tags) && item.tags.includes(tag)
+  }
 </script>
 
 <template>
@@ -488,394 +488,383 @@ function hasTag (item, tag) {
 </template>
 
 <style lang="scss" scoped>
-@use '@/assets/_colors.scss' as c;
-@use '@/assets/_fonts.scss' as f;
-@use '@/assets/_buttons.scss' as btn;
-
-/* ---------- BASE (MOBILE FIRST) ---------- */
-
-.homeSchedule {
-  font-family: f.$font-primary;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "info"
-    "list";
-  gap: 24px;
-  padding: 32px clamp(1.25rem, 4vw, 2rem);
-  border-radius: 14px;
-}
-
-/* INFO-kolonne */
-
-.homeSchedule__info {
-  grid-area: info;
-  align-self: start;
-}
-
-.homeSchedule__infoTitle {
-  margin: 0 0 12px;
-  font-family: f.$font-secondary;
-  font-weight: 600;
-  line-height: 1.25;
-  color: c.$color-primary;
-
-  span {
-    font-weight: 900;
-  }
-}
-
-.homeSchedule__infoText {
-  margin: 0 0 18px;
-  color: c.$color-primary;
-  line-height: 1.7rem;
-}
-
-.homeSchedule__infoBtn {
-  @include btn.button(btn.$button-primary);
-  font-family: f.$font-primary;
-  text-decoration: none;
-  box-shadow: 0 10px 20px rgba(243, 115, 65, 0.25);
-}
-
-/* LISTE-kolonne */
-
-.homeSchedule__list {
-  grid-area: list;
-  display: grid;
-  gap: 18px;
-}
-
-/* tabs + filter */
-
-.homeSchedule__tabs {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #d0d4e4;
-  padding-bottom: 4px;
-}
-
-.homeSchedule__tabButtons {
-  display: flex;
-  gap: 16px;
-}
-
-.homeSchedule__tabBtn {
-  border: none;
-  background: transparent;
-  font-family: f.$font-secondary;
-  font-size: 1rem;
-  padding: 8px 0;
-  cursor: pointer;
-  position: relative;
-  color: #252b45;
-}
-
-.homeSchedule__tabBtn--active::after {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  bottom: -4px;
-  height: 3px;
-  border-radius: 999px;
-  background: c.$color-primary;
-}
-
-.homeSchedule__tabBtn--active {
-  font-weight: 700;
-}
-
-.homeSchedule__filterBtn {
-  border: none;
-  background: transparent;
-  font-family: f.$font-secondary;   // samme font som tabs
-  font-size: 0.96rem;                // samme størrelse
-  font-weight: 600;                 // samme vægt som Aktivitet/Hold
-  padding: 8px 0;
-  cursor: pointer;
-  position: relative;
-  color: #252b45;
-}
+  @use '@/assets/_colors.scss' as c;
+  @use '@/assets/_fonts.scss' as f;
+  @use '@/assets/_buttons.scss' as btn;
 
 
-/* fejl / tom liste */
-
-.homeSchedule__error {
-  color: #b00020;
-}
-
-.homeSchedule__empty {
-  margin: 0;
-}
-
-/* dags-grupper */
-
-.homeSchedule__dayGroup {
-  display: grid;
-  gap: 10px;
-}
-
-.homeSchedule__dayTitle {
-  margin: 0;
-  font-family: f.$font-secondary;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: c.$color-primary;
-}
-
-.homeSchedule__dayList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
-
-/* kort – mobile: én kolonne */
-
-.homeSchedule__card {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 16px 18px;
-  background: c.$color-secondary;
-  border-radius: 14px;
-  border: 1px solid #c5c8d3;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-}
-
-.homeSchedule__cardMain {
-  display: grid;
-  gap: 6px;
-}
-
-.homeSchedule__cardTitle {
-  font-family: f.$font-secondary;
-  font-weight: 800;
-  font-size: 1rem;
-  color: c.$color-primary;
-}
-
-.homeSchedule__cardMeta {
-  font-size: 0.9rem;
-  color: #1e1e1e;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.homeSchedule__cardLead {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.homeSchedule__cardTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.homeSchedule__tag {
-  font-size: 0.8rem;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #eef0ff;
-}
-
-.homeSchedule__cardActions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
-.homeSchedule__cardLink {
-  text-decoration: none;
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: c.$color-primary;
-  color: c.$color-secondary;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-/* ---------- FILTER-OVERLAY – MOBILE (bottom sheet) ---------- */
-
-.filterModal {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-}
-
-.filterModal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-}
-
-/* mobile: bottom sheet, fuld bredde */
-.filterModal__panel {
-  position: absolute;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background: c.$color-secondary;
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
-  width: 100%;
-  max-height: 80vh;
-
-  padding: 20px 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-}
-
-.filterModal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.filterModal__header h3 {
-  margin: 0;
-  font-family: f.$font-secondary;
-  font-size: 1.2rem;
-}
-
-.filterModal__close {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 1.1rem;
-}
-
-.filterModal__section {
-  border-top: 1px solid #e2e4f0;
-  padding-top: 10px;
-}
-
-.filterModal__section h4 {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #7a7f93;
-}
-
-.filterCheckbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  margin-bottom: 4px;
-}
-
-.filterCheckbox input {
-  width: 16px;
-  height: 16px;
-}
-
-.filterModal__footer {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  flex-wrap: nowrap;  // <— vigtig!
-}
-
-/* knapper = samme form som adminBtn */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 8px 20px;          // MINDRE end før (10px 26px)
-  border-radius: 10px;        // samme form
-  font-size: 0.85rem;         // lidt mindre tekst
-  font-weight: 800;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.2s ease;
-  font-family: f.$font-primary;
-
-  border: 2px solid c.$cta;
-  background: transparent;
-
-  /* gør at NULSTIL + GEM står på række */
-  white-space: nowrap;
-}
-
-/* GEM = orange */
-.btn--primary {
-  background: c.$cta;
-  color: c.$color-secondary;
-
-  &:hover {
-    background: c.$color-tertiary;
-    border-color: c.$color-tertiary;
-    transform: translateY(-1px);
-  }
-}
-
-/* NULSTIL = hvid med orange kant (adminBtn--secondary) */
-.btn--ghost {
-  background: c.$color-secondary;
-  color: c.$cta;
-
-  &:hover:not(:disabled) {
-    border-color: c.$color-tertiary;
-    color: c.$color-tertiary;
-    transform: translateY(-1px);
-  }
-}
-
-.btn--ghost:disabled {
-  opacity: 0.4;
-  cursor: default;
-  transform: none;
-}
-
-/* ---------- BREAKPOINTS (større skærme) ---------- */
-
-/* tablet-ish */
-@media (min-width: 680px) {
   .homeSchedule {
-    padding: 40px clamp(1.5rem, 5vw, 70px);
+    font-family: f.$font-primary;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "info"
+      "list";
+    gap: 24px;
+    padding: 32px clamp(1.25rem, 4vw, 2rem);
+    border-radius: 14px;
   }
 
-  .homeSchedule__card {
-    grid-template-columns: 1fr auto;
+  /* INFO-kolonne */
+
+  .homeSchedule__info {
+    grid-area: info;
+    align-self: start;
+  }
+
+  .homeSchedule__infoTitle {
+    margin: 0 0 12px;
+    font-family: f.$font-secondary;
+    font-weight: 600;
+    line-height: 1.25;
+    color: c.$color-primary;
+
+    span {
+      font-weight: 900;
+    }
+  }
+
+  .homeSchedule__infoText {
+    margin: 0 0 18px;
+    color: c.$color-primary;
+    line-height: 1.7rem;
+  }
+
+  .homeSchedule__infoBtn {
+    @include btn.button(btn.$button-primary);
+    font-family: f.$font-primary;
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(243, 115, 65, 0.25);
+  }
+
+  /* LISTE-kolonne */
+
+  .homeSchedule__list {
+    grid-area: list;
+    display: grid;
+    gap: 18px;
+  }
+
+  /* tabs + filter */
+
+  .homeSchedule__tabs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #d0d4e4;
+    padding-bottom: 4px;
+  }
+
+  .homeSchedule__tabButtons {
+    display: flex;
     gap: 16px;
   }
 
+  .homeSchedule__tabBtn {
+    border: none;
+    background: transparent;
+    font-family: f.$font-secondary;
+    font-size: 1rem;
+    padding: 8px 0;
+    cursor: pointer;
+    position: relative;
+    color: #252b45;
+  }
+
+  .homeSchedule__tabBtn--active::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -4px;
+    height: 3px;
+    border-radius: 999px;
+    background: c.$color-primary;
+  }
+
+  .homeSchedule__tabBtn--active {
+    font-weight: 700;
+  }
+
+  .homeSchedule__filterBtn {
+    border: none;
+    background: transparent;
+    font-family: f.$font-secondary;  
+    font-size: 0.96rem;           
+    font-weight: 600;              
+    padding: 8px 0;
+    cursor: pointer;
+    position: relative;
+    color: #252b45;
+  }
+
+
+  /* fejl / tom liste */
+
+  .homeSchedule__error {
+    color: #b00020;
+  }
+
+  .homeSchedule__empty {
+    margin: 0;
+  }
+
+  /* dags-grupper */
+
+  .homeSchedule__dayGroup {
+    display: grid;
+    gap: 10px;
+  }
+
+  .homeSchedule__dayTitle {
+    margin: 0;
+    font-family: f.$font-secondary;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: c.$color-primary;
+  }
+
+  .homeSchedule__dayList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .homeSchedule__card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px 18px;
+    background: c.$color-secondary;
+    border-radius: 14px;
+    border: 1px solid #c5c8d3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  }
+
+  .homeSchedule__cardMain {
+    display: grid;
+    gap: 6px;
+  }
+
+  .homeSchedule__cardTitle {
+    font-family: f.$font-secondary;
+    font-weight: 800;
+    font-size: 1rem;
+    color: c.$color-primary;
+  }
+
+  .homeSchedule__cardMeta {
+    font-size: 0.9rem;
+    color: #1e1e1e;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .homeSchedule__cardLead {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .homeSchedule__cardTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .homeSchedule__tag {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #eef0ff;
+  }
+
   .homeSchedule__cardActions {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
-  /* filter-modal: lille kort i højre side */
+  .homeSchedule__cardLink {
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: c.$color-primary;
+    color: c.$color-secondary;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .filterModal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+  }
+
+  .filterModal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
   .filterModal__panel {
-    top: 150px;
-    right: clamp(16px, 5vw, 70px);
-    left: auto;
-    bottom: auto;
-    width: min(340px, 90vw);
-    max-height: calc(100vh - 260px);
-    border-radius: 16px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: c.$color-secondary;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-height: 80vh;
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
   }
-}
 
-/* desktop: to kolonner med info + liste */
-@media (min-width: 900px) {
-  .homeSchedule {
-    grid-template-columns: 0.9fr 1.6fr;
-    grid-template-areas: "info list";
+  .filterModal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-}
+
+  .filterModal__header h3 {
+    margin: 0;
+    font-family: f.$font-secondary;
+    font-size: 1.2rem;
+  }
+
+  .filterModal__close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
+  .filterModal__section {
+    border-top: 1px solid #e2e4f0;
+    padding-top: 10px;
+  }
+
+  .filterModal__section h4 {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7a7f93;
+  }
+
+  .filterCheckbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+
+  .filterCheckbox input {
+    width: 16px;
+    height: 16px;
+  }
+
+  .filterModal__footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: nowrap; 
+  }
+
+  /* knapper = samme form som adminBtn */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;          
+    border-radius: 10px;       
+    font-size: 0.85rem;      
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-family: f.$font-primary;
+
+    border: 2px solid c.$cta;
+    background: transparent;
+
+    /* gør at NULSTIL + GEM står på række */
+    white-space: nowrap;
+  }
+
+  /* GEM = orange */
+  .btn--primary {
+    background: c.$cta;
+    color: c.$color-secondary;
+
+    &:hover {
+      background: c.$color-tertiary;
+      border-color: c.$color-tertiary;
+      transform: translateY(-1px);
+    }
+  }
+
+  /* NULSTIL = hvid med orange kant (adminBtn--secondary) */
+  .btn--ghost {
+    background: c.$color-secondary;
+    color: c.$cta;
+
+    &:hover:not(:disabled) {
+      border-color: c.$color-tertiary;
+      color: c.$color-tertiary;
+      transform: translateY(-1px);
+    }
+  }
+
+  .btn--ghost:disabled {
+    opacity: 0.4;
+    cursor: default;
+    transform: none;
+  }
+
+  @media (min-width: 600px) {
+    .homeSchedule {
+      padding: 40px clamp(1.5rem, 5vw, 70px);
+    }
+
+    .homeSchedule__card {
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+    }
+
+    .homeSchedule__cardActions {
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+
+    /* filter-modal: lille kort i højre side */
+    .filterModal__panel {
+      top: 150px;
+      right: clamp(16px, 5vw, 70px);
+      left: auto;
+      bottom: auto;
+      width: min(340px, 90vw);
+      max-height: calc(100vh - 260px);
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  /* desktop: to kolonner med info + liste */
+  @media (min-width: 900px) {
+    .homeSchedule {
+      grid-template-columns: 0.9fr 1.6fr;
+      grid-template-areas: "info list";
+    }
+  }
 </style>
 

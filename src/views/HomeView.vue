@@ -1,14 +1,14 @@
 <script setup>
-import SectionDarkBlue from '@/components/SectionDarkBlue.vue';
-import AboutFollow from '@/components/AboutFollow.vue';
-import SectionLightBlue from '@/components/SectionLightBlue.vue';
-import HeroSlide from '@/components/HeroSlideshow.vue'
-import HomeSchedule from '@/components/HomeSchedule.vue'
-import OpeningHours from '@/components/OpeningHours.vue'
-import Aktiviteter from '@/components/FindActivity.vue'
+  import SectionDarkBlue from '@/components/SectionDarkBlue.vue';
+  import AboutFollow from '@/components/AboutFollow.vue';
+  import SectionLightBlue from '@/components/SectionLightBlue.vue';
+  import HeroSlide from '@/components/HeroSlideshow.vue'
+  import HomeSchedule from '@/components/HomeSchedule.vue'
+  import OpeningHours from '@/components/OpeningHours.vue'
+  import Aktiviteter from '@/components/FindActivity.vue'
 
-import GroupPhoto from '@/assets/images/activities/grouphug.webp';
-import HulaHop from '@/assets/images/activities/hulahop.webp';
+  import GroupPhoto from '@/assets/images/activities/grouphug.webp';
+  import HulaHop from '@/assets/images/activities/hulahop.webp';
 </script>
 
 <template>

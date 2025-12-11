@@ -28,9 +28,9 @@
     }
 
     .opening-hours__row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 2px solid c.$color-secondary;
-    padding-block: 0.3rem;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid c.$color-secondary;
+        padding-block: 0.3rem;
     }
 </style>

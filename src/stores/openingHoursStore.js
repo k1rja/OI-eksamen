@@ -9,6 +9,7 @@ if (!DB_URL) {
 // ---------- Liste over faciliteter ----------
 
 export const openingFacilities = [
+  { id: "bolbro", name: "Svømmehallen Bolbro" },
   { id: "hoejme", name: "Svømmehallen Højme" },
   { id: "klosterbakken", name: "Svømmehallen Klosterbakken" },
   { id: "universitet", name: "Svømmehallen Universitet" },

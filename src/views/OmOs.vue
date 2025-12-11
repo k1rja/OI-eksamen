@@ -1,20 +1,19 @@
 <script setup>
-import HeroTamplate      from '@/components/HeroTamplate.vue';
-import SectionDarkBlue   from '@/components/SectionDarkBlue.vue';
-import SectionLightBlue  from '@/components/SectionLightBlue.vue';
+  import HeroTamplate      from '@/components/HeroTamplate.vue';
+  import SectionDarkBlue   from '@/components/SectionDarkBlue.vue';
+  import SectionLightBlue  from '@/components/SectionLightBlue.vue';
 
-import AboutFacilities   from '@/components/AboutFacilities.vue';
-import AboutValues       from '@/components/AboutValues.vue';
-import AboutFollow       from '@/components/AboutFollow.vue';
+  import AboutFacilities   from '@/components/AboutFacilities.vue';
+  import AboutValues       from '@/components/AboutValues.vue';
+  import AboutFollow       from '@/components/AboutFollow.vue';
 
-import friendsImg    from '@/assets/images/about/friends.webp';
-import communityImg  from '@/assets/images/about/community.webp';
-import bikeImg       from '@/assets/images/about/cykel.webp';
-import handsImg      from '@/assets/images/about/hands.webp';
+  import friendsImg    from '@/assets/images/about/friends.webp';
+  import communityImg  from '@/assets/images/about/community.webp';
+  import bikeImg       from '@/assets/images/about/cykel.webp';
+  import handsImg      from '@/assets/images/about/hands.webp';
 </script>
 
 <template>
-  <!-- HERO -->
   <div class="about-hero">
     <HeroTamplate
       :image="friendsImg"
@@ -24,10 +23,8 @@ import handsImg      from '@/assets/images/about/hands.webp';
     />
   </div>
 
-  <!-- VORES FACILITETER -->
   <AboutFacilities />
 
-  <!-- MERE END BARE SPORT -->
   <SectionLightBlue
     :image="bikeImg"
     title="Mere end bare sport"
@@ -36,10 +33,8 @@ import handsImg      from '@/assets/images/about/hands.webp';
     buttonLink="/aktiviteter"
   />
 
-  <!-- VÆRDIER OG VISION -->
   <AboutValues />
 
-  <!-- FÆLLESSKAB OG FRIVILLIGHED -->
   <SectionDarkBlue
     :image="communityImg"
     title="Fællesskab og frivillighed"
@@ -48,10 +43,8 @@ import handsImg      from '@/assets/images/about/hands.webp';
     buttonLink="/frivillighed"
   />
 
-  <!-- FØLG MED -->
   <AboutFollow />
 
-  <!-- HAR DU SPØRGSMÅL? -->
   <SectionDarkBlue
     :image="handsImg"
     title="Har du spørgsmål?"
@@ -62,25 +55,23 @@ import handsImg      from '@/assets/images/about/hands.webp';
 </template>
 
 <style scoped lang="scss">
-@use '../assets/_colors.scss' as c;
+  @use '../assets/_colors.scss' as c;
 
-/* mørkere gradient kun på OM OS hero */
-.about-hero :deep(.hero_tamplate--gradient::before) {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.55) 40%,
-    rgba(0, 0, 0, 0.9) 100%
-  );
-}
+  .about-hero :deep(.hero_tamplate--gradient::before) {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.55) 40%,
+      rgba(0, 0, 0, 0.9) 100%
+    );
+  }
 
-/* match hero-typografi */
-.about-hero :deep(.content_h2) {
-  font-variation-settings: "wght" 700;
-  font-size: clamp(1.6rem, 4vw, 3rem);
-}
+  .about-hero :deep(.content_h2) {
+    font-variation-settings: "wght" 700;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+  }
 
-.about-hero :deep(.content_h2 span) {
-  font-variation-settings: "wght" 900;
-}
+  .about-hero :deep(.content_h2 span) {
+    font-variation-settings: "wght" 900;
+  }
 </style>

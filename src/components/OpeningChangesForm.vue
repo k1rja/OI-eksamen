@@ -1,51 +1,102 @@
 <script setup>
-import { ref, watch } from "vue";
-import {
-  openingFacilities,
-  addOpeningChange,
-  updateOpeningChange
-} from "@/stores/openingHoursStore";
+  import { ref, watch } from "vue";
+  import {
+    openingFacilities,
+    addOpeningChange,
+    updateOpeningChange
+  } from "@/stores/openingHoursStore";
 
-const props = defineProps({
-  // hvis der er valgt en ændring i listen til redigering
-  change: { type: Object, default: null }
-});
+  const props = defineProps({
+    // hvis der er valgt en ændring i listen til redigering
+    change: { type: Object, default: null }
+  });
 
-const emit = defineEmits(["created", "updated"]);
+  const emit = defineEmits(["created", "updated"]);
 
-const facilities = openingFacilities;
+  const facilities = openingFacilities;
 
-const form = ref({
-  id: null,
-  facilityId: "",
-  isClosed: false,
-  dateFrom: "",
-  dateTo: "",
-  timeFrom: "",
-  timeTo: "",
-  reason: ""
-});
+  const form = ref({
+    id: null,
+    facilityId: "",
+    isClosed: false,
+    dateFrom: "",
+    dateTo: "",
+    timeFrom: "",
+    timeTo: "",
+    reason: ""
+  });
 
-const submitting = ref(false);
-const error = ref("");
-const success = ref(false);
+  const submitting = ref(false);
+  const error = ref("");
+  const success = ref(false);
 
-// sync form, når man vælger noget i oversigten
-watch(
-  () => props.change,
-  (c) => {
-    if (c) {
-      form.value = {
-        id: c.id ?? null,
-        facilityId: c.facilityId ?? "",
-        isClosed: !!c.isClosed,
-        dateFrom: c.dateFrom ?? "",
-        dateTo: c.dateTo ?? "",
-        timeFrom: c.timeFrom ?? "",
-        timeTo: c.timeTo ?? "",
-        reason: c.reason ?? ""
-      };
-    } else {
+  // sync form, når man vælger noget i oversigten
+  watch(
+    () => props.change,
+    (c) => {
+      if (c) {
+        form.value = {
+          id: c.id ?? null,
+          facilityId: c.facilityId ?? "",
+          isClosed: !!c.isClosed,
+          dateFrom: c.dateFrom ?? "",
+          dateTo: c.dateTo ?? "",
+          timeFrom: c.timeFrom ?? "",
+          timeTo: c.timeTo ?? "",
+          reason: c.reason ?? ""
+        };
+      } else {
+        form.value = {
+          id: null,
+          facilityId: "",
+          isClosed: false,
+          dateFrom: "",
+          dateTo: "",
+          timeFrom: "",
+          timeTo: "",
+          reason: ""
+        };
+      }
+      error.value = "";
+      success.value = false;
+    },
+    { immediate: true }
+  );
+
+  async function submit() {
+    error.value = "";
+    success.value = false;
+
+    if (!form.value.facilityId || !form.value.dateFrom) {
+      error.value = "Vælg facilitet og mindst én startdato.";
+      return;
+    }
+
+    submitting.value = true;
+
+    const payload = {
+      facilityId: form.value.facilityId,
+      isClosed: !!form.value.isClosed,
+      dateFrom: form.value.dateFrom,
+      dateTo: form.value.dateTo || "",
+      timeFrom: form.value.timeFrom || "",
+      timeTo: form.value.timeTo || "",
+      reason: form.value.reason || ""
+    };
+
+    try {
+      // REDIGERING
+      if (form.value.id) {
+        const updated = await updateOpeningChange(form.value.id, payload);
+        emit("updated", updated);
+        success.value = true;
+        return;
+      }
+
+      // OPRETTELSE
+      const created = await addOpeningChange(payload);
+      emit("created", created);
+
       form.value = {
         id: null,
         facilityId: "",
@@ -56,67 +107,16 @@ watch(
         timeTo: "",
         reason: ""
       };
-    }
-    error.value = "";
-    success.value = false;
-  },
-  { immediate: true }
-);
 
-async function submit() {
-  error.value = "";
-  success.value = false;
-
-  if (!form.value.facilityId || !form.value.dateFrom) {
-    error.value = "Vælg facilitet og mindst én startdato.";
-    return;
-  }
-
-  submitting.value = true;
-
-  const payload = {
-    facilityId: form.value.facilityId,
-    isClosed: !!form.value.isClosed,
-    dateFrom: form.value.dateFrom,
-    dateTo: form.value.dateTo || "",
-    timeFrom: form.value.timeFrom || "",
-    timeTo: form.value.timeTo || "",
-    reason: form.value.reason || ""
-  };
-
-  try {
-    // REDIGERING
-    if (form.value.id) {
-      const updated = await updateOpeningChange(form.value.id, payload);
-      emit("updated", updated);
       success.value = true;
-      return;
+      setTimeout(() => (success.value = false), 1200);
+    } catch (e) {
+      console.error(e);
+      error.value = "Kunne ikke gemme ændringen.";
+    } finally {
+      submitting.value = false;
     }
-
-    // OPRETTELSE
-    const created = await addOpeningChange(payload);
-    emit("created", created);
-
-    form.value = {
-      id: null,
-      facilityId: "",
-      isClosed: false,
-      dateFrom: "",
-      dateTo: "",
-      timeFrom: "",
-      timeTo: "",
-      reason: ""
-    };
-
-    success.value = true;
-    setTimeout(() => (success.value = false), 1200);
-  } catch (e) {
-    console.error(e);
-    error.value = "Kunne ikke gemme ændringen.";
-  } finally {
-    submitting.value = false;
   }
-}
 </script>
 
 
@@ -189,68 +189,65 @@ async function submit() {
 
 
 <style scoped lang="scss">
-@use '@/assets/_buttons.scss' as btn;
+  @use '@/assets/_buttons.scss' as btn;
 
-.adminForm {
-  display: grid;
-  gap: 10px;
-}
-
-.adminForm label {
-  display: grid;
-  gap: 4px;
-  font-size: 0.9rem;
-}
-
-.adminForm input,
-.adminForm textarea,
-.adminForm select {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid #c9c9c9;
-  font-size: 0.9rem;
-}
-
-.adminForm__checkbox {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-}
-
-/* Række-layout: mobile first, så 2 kolonner fra 600px */
-.adminForm__row {
-  display: grid;
-  gap: 10px;
-}
-
-@media (min-width: 600px) {
-  .adminForm__row {
-    grid-template-columns: 1fr 1fr;
+  .adminForm {
+    display: grid;
+    gap: 10px;
   }
-}
 
-/* Knap – samme som i ActivityForm */
-.adminBtn {
-  @include btn.button(btn.$button-primary);
-  display: inline-flex;
-  margin-top: 12px;
-  cursor: pointer;
-}
+  .adminForm label {
+    display: grid;
+    gap: 4px;
+    font-size: 0.9rem;
+  }
 
-/* vi behøver ikke definere .adminBtn--full – så opfører den sig som i ActivityForm */
+  .adminForm input,
+  .adminForm textarea,
+  .adminForm select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #c9c9c9;
+    font-size: 0.9rem;
+  }
 
-.msg {
-  font-size: 0.85rem;
-  margin-top: 4px;
-}
+  .adminForm__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
 
-.msg--error {
-  color: #b00020;
-}
+  .adminForm__row {
+    display: grid;
+    gap: 10px;
+  }
 
-.msg--success {
-  color: #1b7a34;
-}
+  @media (min-width: 600px) {
+    .adminForm__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .adminBtn {
+    @include btn.button(btn.$button-primary);
+    display: inline-flex;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+
+  .msg {
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+
+  .msg--error {
+    color: #b00020;
+  }
+
+  .msg--success {
+    color: #1b7a34;
+  }
 </style>
 

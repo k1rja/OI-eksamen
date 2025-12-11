@@ -1,8 +1,8 @@
 <script setup>
-import morehandsImg from '@/assets/images/about/morehands.webp';
-import runningImg   from '@/assets/images/about/running.webp';
-import accessImg    from '@/assets/images/about/accessibility.webp';
-import yogaImg      from '@/assets/images/about/yoga.webp';
+    import morehandsImg from '@/assets/images/about/morehands.webp';
+    import runningImg   from '@/assets/images/about/running.webp';
+    import accessImg    from '@/assets/images/about/accessibility.webp';
+    import yogaImg      from '@/assets/images/about/yoga.webp';
 </script>
 
 <template>

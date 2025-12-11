@@ -1,71 +1,73 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import ActivityForm from '@/components/ActivityForm.vue'
+  import { ref, onMounted } from 'vue'
+  import ActivityForm from '@/components/ActivityForm.vue'
+  import { formatDateDa } from '@/utils/date'
 
-const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
 
-const activities = ref([])
-const loading = ref(false)
-const error = ref('')
-const editing = ref(null)
+  const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
 
-function hasTag(act, key) {
-  return Array.isArray(act.tags) && act.tags.includes(key)
-}
+  const activities = ref([])
+  const loading = ref(false)
+  const error = ref('')
+  const editing = ref(null)
 
-async function load() {
-  loading.value = true
-  error.value = ''
-
-  try {
-    const res = await fetch(`${DB_URL}/activities.json`)
-    if (!res.ok) throw new Error('HTTP ' + res.status)
-    const raw = (await res.json()) || {}
-
-    activities.value = Object.entries(raw)
-      .map(([id, v]) => ({
-        id,
-        ...v,
-        tags: Array.isArray(v.tags) ? v.tags : [],
-      }))
-      .filter(Boolean)
-  } catch (e) {
-    console.error(e)
-    error.value = 'Kunne ikke hente aktiviteter.'
-  } finally {
-    loading.value = false
+  function hasTag(act, key) {
+    return Array.isArray(act.tags) && act.tags.includes(key)
   }
-}
 
-function onCreated(act) {
-  activities.value.push(act)
-}
+  async function load() {
+    loading.value = true
+    error.value = ''
 
-function onUpdated(updated) {
-  const i = activities.value.findIndex(a => a.id === updated.id)
-  if (i !== -1) activities.value[i] = updated
-  editing.value = null
-}
+    try {
+      const res = await fetch(`${DB_URL}/activities.json`)
+      if (!res.ok) throw new Error('HTTP ' + res.status)
+      const raw = (await res.json()) || {}
 
-function onEdit(act) {
-  editing.value = { ...act }
-}
-
-async function onDelete(id) {
-  if (!confirm('Vil du slette denne aktivitet?')) return
-  try {
-    const res = await fetch(`${DB_URL}/activities/${id}.json`, {
-      method: 'DELETE',
-    })
-    if (!res.ok) throw new Error('HTTP ' + res.status)
-    activities.value = activities.value.filter(a => a.id !== id)
-  } catch (e) {
-    console.error(e)
-    alert('Kunne ikke slette aktiviteten.')
+      activities.value = Object.entries(raw)
+        .map(([id, v]) => ({
+          id,
+          ...v,
+          tags: Array.isArray(v.tags) ? v.tags : [],
+        }))
+        .filter(Boolean)
+    } catch (e) {
+      console.error(e)
+      error.value = 'Kunne ikke hente aktiviteter.'
+    } finally {
+      loading.value = false
+    }
   }
-}
 
-onMounted(load)
+  function onCreated(act) {
+    activities.value.push(act)
+  }
+
+  function onUpdated(updated) {
+    const i = activities.value.findIndex(a => a.id === updated.id)
+    if (i !== -1) activities.value[i] = updated
+    editing.value = null
+  }
+
+  function onEdit(act) {
+    editing.value = { ...act }
+  }
+
+  async function onDelete(id) {
+    if (!confirm('Vil du slette denne aktivitet?')) return
+    try {
+      const res = await fetch(`${DB_URL}/activities/${id}.json`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error('HTTP ' + res.status)
+      activities.value = activities.value.filter(a => a.id !== id)
+    } catch (e) {
+      console.error(e)
+      alert('Kunne ikke slette aktiviteten.')
+    }
+  }
+
+  onMounted(load)
 </script>
 
 <template>
@@ -110,12 +112,12 @@ onMounted(load)
                 <p v-if="act.lead" class="card__lead">{{ act.lead }}</p>
 
                 <p class="card__meta">
-                <span v-if="act.date">{{ act.date }}</span>
-                <span v-if="act.start || act.end">
+                  <span v-if="act.date">{{ formatDateDa(act.date) }}</span>
+                  <span v-if="act.start || act.end">
                     • {{ act.start || '—' }}–{{ act.end || '—' }}
-                </span>
-                <span v-if="act.location"> • {{ act.location }}</span>
-                <span v-if="act.priceText"> • Pris: {{ act.priceText }}</span>
+                  </span>
+                  <span v-if="act.location"> • {{ act.location }}</span>
+                  <span v-if="act.priceText"> • Pris: {{ act.priceText }}</span>
                 </p>
 
                 <div class="card__tags">

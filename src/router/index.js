@@ -13,9 +13,6 @@ import KlodsterBakken from '@/views/KlodsterBakken.vue'
 import Havnebadet from '@/views/Havnebadet.vue'
 import LoginChoice from '@/views/LoginChoice.vue'
 
-// OBS: komponenter som Header, HomeSchedule, SectionDarkBlue, FindActivity,
-// OpeningHours osv. bruger du inde i views – de behøver normalt ikke egne routes,
-// så dem har jeg ikke importeret her.
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,8 +37,6 @@ const router = createRouter({
       name: 'events',
       component: Events,
     },
-
-    // Aktiviteter / foreninger
     {
       path: '/aktivitetsoversigt',
       name: 'aktivitetsoversigt',
@@ -52,8 +47,6 @@ const router = createRouter({
       name: 'foreningsstrength',
       component: ForeningsStrength,
     },
-
-    // Om os + kontakt
     {
       path: '/omos',
       name: 'omos',
@@ -69,8 +62,6 @@ const router = createRouter({
       name: 'kontaktformular',
       component: KontaktFormular,
     },
-
-    // Lokationer
     {
       path: '/klodsterbakken',
       name: 'klodsterbakken',
@@ -82,7 +73,6 @@ const router = createRouter({
       component: Havnebadet,
     },
 
-    // Diverse admin / ekstra sider
     {
       path: '/activities/movetraining',
       name: 'movetraining',
@@ -95,7 +85,6 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition
     }
-    // ellers: altid top
     return { left: 0, top: 0 }
   },
 })

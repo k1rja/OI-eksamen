@@ -30,10 +30,10 @@
     const inDesktop = desktopNavRef.value?.contains(e.target)
     const inMobile  = mobileNavRef.value?.contains(e.target)
     const onBurger  = burgerRef.value?.contains(e.target)
-    if (!inDesktop && !inMobile && !onBurger) {
-        activeIndex.value = null
-        isMenuOpen.value  = false
-    }
+        if (!inDesktop && !inMobile && !onBurger) {
+            activeIndex.value = null
+            isMenuOpen.value  = false
+        }
     }
 
     onMounted(() => document.addEventListener('click', onDocClick, { capture: true }))
@@ -104,7 +104,9 @@
                     </li>
 
                     <li>
-                        <button @click="toggle(3)">Om os<img></button>
+                        <RouterLink to="/omos">
+                            Om Odense Idrætspark
+                        </RouterLink>
                     </li>
 
                     <li>
@@ -211,8 +213,11 @@
                 </li>
 
                 <li>
-                    <button @click="toggle(3)">Om os<img></button>
+                    <RouterLink to="/omos" class="header_nav_link header_nav_link--kontakt">
+                        Om Odense Idrætspark
+                    </RouterLink>
                 </li>
+
 
                 <li>
                     <RouterLink to="/kontakt" class="header_nav_link header_nav_link--kontakt">
@@ -225,298 +230,286 @@
 </template>
 
 <style lang="scss" scoped>
-@use '../assets/_colors.scss' as c;
-@use '../assets/_fonts.scss' as f;
-
-.top_header {
-    display: none;
-}
-
-.dropdown__arrow {
-    width: 14px;          // lidt bredere
-    height: 8px;          // lavere = mindre spids
-    margin-left: 8px;
-    transition: transform 0.3s ease;
-    object-fit: contain;  // bevar pilens proportioner pænt
-}
-
-
-.dropdown__arrow.rotated {
-    transform: rotate(180deg);
-}
-
-.bottom_header_nav {
-    display: none;
-}
-
-.hamburger {
-    margin-top: 20px;
-    background-color: transparent;
-    border: 0px;
-}
-
-/* ---------------------- */
-/* MOBILE NAVIGATION      */
-/* ---------------------- */
-
-.mobil_nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 60%;
-    max-width: 320px;
-    background: #F5F5F5;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 999;
-    padding: 2rem 1.5rem;
-    color: c.$color-primary;
-
-    &.open {
-        transform: translateX(0);
-    }
-
-    &_ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-
-        li {
-            margin-bottom: 1rem;
-
-            button,
-            a {
-                background: none;
-                border: none;
-                font-size: 1.1rem;
-                color: #210700;
-                text-decoration: none;
-                width: 100%;
-                text-align: left;
-                cursor: pointer;
-            }
-
-            button {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-
-                .dropdown__arrow {
-                    transition: transform 0.3s ease;
-
-                    &.rotated {
-                        transform: rotate(180deg);
-                    }
-                }
-            }
-
-            ul {
-                margin-top: 0.5rem;
-                margin-left: 1rem;
-
-                li {
-                    margin-bottom: 0.5rem;
-                }
-            }
-
-            ul {
-                list-style: none;
-                margin: 0.3rem 0 0 1rem;
-                padding: 0;
-
-                li {
-                    padding: 0.4rem 0;
-                    font-size: 1rem;
-                    color: #210700;
-                }
-            }
-        }
-    }
-}
-
-.logo_mobil_some {
-    width: 30px;
-    margin: 5px;
-}
-
-.header_mobil {
-    display: flex;
-    justify-content: space-between;
-    margin: 15px 15px;
-}
-
-.mobil_ikon_img {
-    width: 20px;
-    height: 20px;
-    margin: 10px;
-    margin-top: 20px;
-}
-
-.mobil_logo_img {
-    width: 130px;
-}
-
-.mobil_header_actions {
-    display: flex;
-}
-
-.mobil_nav_ul {
-    position: absolute;
-}
-
-
-@media (min-width: 1024px) {
-
-    .header_mobil {
-    display: none;
-    }
+    @use '../assets/_colors.scss' as c;
+    @use '../assets/_fonts.scss' as f;
 
     .top_header {
-    display: flex;
-    margin: 10px 20px;
-    justify-content: space-between;
+        display: none;
+    }
+
+    .dropdown__arrow {
+        width: 14px;     
+        height: 8px;      
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+        object-fit: contain;
+    }
+
+
+    .dropdown__arrow.rotated {
+        transform: rotate(180deg);
     }
 
     .bottom_header_nav {
-    width: 100%;
-    height: 35px;
-    background-color: c.$color-primary;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+        display: none;
+    }
 
-    /* EKSTRA HORIZONTAL LUFT RUNDT OM ALT */
-    padding: 0.5rem clamp(2rem, 5vw, 4rem);
+    .hamburger {
+        margin-top: 20px;
+        background-color: transparent;
+        border: 0px;
+    }
 
-    .header_nav_ul {
-        display: flex;
+    .mobil_nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 60%;
+        max-width: 320px;
+        background: #F5F5F5;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 999;
+        padding: 2rem 1.5rem;
+        color: c.$color-primary;
 
-        /* MERE LUFT MELLEM MENUPUNKTERNE */
-        gap: clamp(3rem, 6vw, 5rem);
+        &.open {
+            transform: translateX(0);
+        }
 
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        &_ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
 
-        li {
-            position: relative;
+            li {
+                margin-bottom: 1rem;
 
-            button {
-                background: transparent;
-                border: none;
-                font-size: 13px;
-                font-style: normal;
-                font-weight: 700;
-                cursor: pointer;
-                color: c.$color-secondary;
-                display: flex;
-                align-items: center;
-                gap: 0.3rem;
-                transition: all 0.3s ease;
-
-                &:hover {
-                    color: c.$color-tertiary;
-                    transform: translateY(-2px);
-                }
-
-                img {
-                    width: 10px;
-                    transition: transform 0.3s ease;
-                }
-
-                &.rotated img {
-                    transform: rotate(180deg);
-                }
-            }
-
-            /* --- DROPDOWN (desktop) --- */
-            ul {
-                list-style: none;
-                position: absolute;
-                top: 1.6rem;
-                left: 0;
-                background-color: c.$color-secondary;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-
-                /* bredere dropdown */
-                min-width: 340px;
-                padding: 0.75rem 1.75rem;
-
-                display: flex;
-                flex-direction: column;
-                gap: 0; // styres via li-margin
-                z-index: 2000;
-
-                li {
+                button,
+                a {
+                    background: none;
+                    border: none;
+                    font-size: 1.1rem;
                     color: #210700;
+                    text-decoration: none;
+                    width: 100%;
+                    text-align: left;
                     cursor: pointer;
-                    transition: color 0.2s;
+                }
 
-                    /* mindre afstand mellem punkter */
-                    margin: 2px 0;
-                    font-size: 0.95rem;
-                    line-height: 1.3;
+                button {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
 
-                    a {
-                        color: inherit;
-                        text-decoration: none;
+                    .dropdown__arrow {
+                        transition: transform 0.3s ease;
+
+                        &.rotated {
+                            transform: rotate(180deg);
+                        }
                     }
+                }
 
-                    &:hover,
-                    a:hover {
-                        color: c.$color-tertiary;
+                ul {
+                    margin-top: 0.5rem;
+                    margin-left: 1rem;
+
+                    li {
+                        margin-bottom: 0.5rem;
+                    }
+                }
+
+                ul {
+                    list-style: none;
+                    margin: 0.3rem 0 0 1rem;
+                    padding: 0;
+
+                    li {
+                        padding: 0.4rem 0;
+                        font-size: 1rem;
+                        color: #210700;
                     }
                 }
             }
         }
     }
-}
 
-
-    .header_some_img {
-    width: 20px;
-    height: 20px;
-    margin: 10px;
-    margin-top: 25px;
+    .logo_mobil_some {
+        width: 30px;
+        margin: 5px;
     }
 
-    .header_logo_img {
-    width: 150px;
+    .header_mobil {
+        display: flex;
+        justify-content: space-between;
+        margin: 15px 15px;
     }
 
-    .actions_img {
-    width: 20px;
-    height: 20px;
-    margin: 10px;
-    margin-top: 25px;
+    .mobil_ikon_img {
+        width: 20px;
+        height: 20px;
+        margin: 10px;
+        margin-top: 20px;
     }
 
-    .top_header_actions {
-    display: flex;
+    .mobil_logo_img {
+        width: 130px;
     }
 
-    .actions_LogInd_p {
-    margin-top: 25px;
-    font-weight: 600;
+    .mobil_header_actions {
+        display: flex;
     }
 
-    .header_nav_link--kontakt {
-    font-size: 13px;
-    font-weight: 700;
-    color: c.$color-secondary;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
+    .mobil_nav_ul {
+        position: absolute;
+    }
 
-    &:hover {
-        color: c.$color-tertiary;
-        transform: translateY(-2px);
+
+    @media (min-width: 1024px) {
+
+        .header_mobil {
+            display: none;
+        }
+
+        .top_header {
+            display: flex;
+            margin: 10px 20px;
+            justify-content: space-between;
+        }
+
+        .bottom_header_nav {
+            width: 100%;
+            height: 35px;
+            background-color: c.$color-primary;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem clamp(2rem, 5vw, 4rem);
+
+            .header_nav_ul {
+                display: flex;
+                gap: clamp(3rem, 6vw, 5rem);
+                list-style: none;
+                margin: 0;
+                padding: 0;
+
+                li {
+                    position: relative;
+
+                    button {
+                        background: transparent;
+                        border: none;
+                        font-size: 13px;
+                        font-style: normal;
+                        font-weight: 700;
+                        cursor: pointer;
+                        color: c.$color-secondary;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.3rem;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                            color: c.$color-tertiary;
+                            transform: translateY(-2px);
+                        }
+
+                        img {
+                            width: 10px;
+                            transition: transform 0.3s ease;
+                        }
+
+                        &.rotated img {
+                            transform: rotate(180deg);
+                        }
+                    }
+
+                    ul {
+                        list-style: none;
+                        position: absolute;
+                        top: 1.6rem;
+                        left: 0;
+                        background-color: c.$color-secondary;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                        min-width: 340px;
+                        padding: 0.75rem 1.75rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0;
+                        z-index: 2000;
+
+                        li {
+                            color: #210700;
+                            cursor: pointer;
+                            transition: color 0.2s;
+                            margin: 2px 0;
+                            font-size: 0.95rem;
+                            line-height: 1.3;
+
+                            a {
+                                color: inherit;
+                                text-decoration: none;
+                            }
+
+                            &:hover,
+                            a:hover {
+                                color: c.$color-tertiary;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        .header_some_img {
+            width: 20px;
+            height: 20px;
+            margin: 10px;
+            margin-top: 25px;
+        }
+
+        .header_logo_img {
+            width: 150px;
+        }
+
+        .actions_img {
+            width: 20px;
+            height: 20px;
+            margin: 10px;
+            margin-top: 25px;
+        }
+
+        .top_header_actions {
+            display: flex;
+        }
+
+        .actions_LogInd_p {
+            margin-top: 25px;
+            font-weight: 600;
+        }
+
+        .header_nav_link--kontakt {
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            font-style: normal;
+            font-weight: 700;
+            cursor: pointer;
+            color: c.$color-secondary;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.3s ease;
+
+            &:hover {
+                color: c.$color-tertiary;
+                transform: translateY(-2px);
+            }
+        }
     }
-    }
-}
 
 </style>

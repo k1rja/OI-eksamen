@@ -1,15 +1,15 @@
 <script setup>
-const props = defineProps({
-  icon: {         
-    type: String,
-    required: true,
-  },
-  text: {          
-    type: String,
-    required: true,
-  },
-  href: String     
-})
+  const props = defineProps({
+    icon: {         
+      type: String,
+      required: true,
+    },
+    text: {          
+      type: String,
+      required: true,
+    },
+    href: String     
+  })
 </script>
 
 <template>
@@ -28,46 +28,20 @@ const props = defineProps({
 </template>
 
 <style scoped lang="scss">
-@use '../assets/_colors.scss' as c;
-@use '../assets/_fonts.scss' as f;
+  @use '../assets/_colors.scss' as c;
+  @use '../assets/_fonts.scss' as f;
 
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 20px;
-  margin-left: 5px;
-}
-
-.contactItem__icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
-.contactItem__text {
-  font-family: f.$font-primary;
-  color: c.$color-primary;
-  text-decoration: none;
-  font-size: 0.75rem;
-}
-
-.contactItem__text:hover {
-  text-decoration: underline;
-}
-
-@media (min-width: 1024px) {
   .contactItem {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 5px;
     margin-bottom: 20px;
-    margin-left: 2px;
+    margin-left: 5px;
   }
 
   .contactItem__icon {
-    width: 28px;
-    height: 28px;
+    width: 18px;
+    height: 18px;
     object-fit: contain;
   }
 
@@ -75,11 +49,37 @@ const props = defineProps({
     font-family: f.$font-primary;
     color: c.$color-primary;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.75rem;
   }
 
   .contactItem__text:hover {
     text-decoration: underline;
   }
-}
+
+  @media (min-width: 1024px) {
+    .contactItem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      margin-left: 2px;
+    }
+
+    .contactItem__icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .contactItem__text {
+      font-family: f.$font-primary;
+      color: c.$color-primary;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .contactItem__text:hover {
+      text-decoration: underline;
+    }
+  }
 </style>

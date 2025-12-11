@@ -1,36 +1,36 @@
 <script setup>
-import SectionDarkBlue from '@/components/SectionDarkBlue.vue';
-import SectionLightBlue from '@/components/SectionLightBlue.vue';
-import HeroTamplate from '@/components/HeroTamplate.vue';
-import OpenHours from '@/components/OpenHours.vue';
-import FacilitetsInfo from '@/components/FacilitetsInfo.vue';
+    import SectionDarkBlue from '@/components/SectionDarkBlue.vue';
+    import SectionLightBlue from '@/components/SectionLightBlue.vue';
+    import HeroTamplate from '@/components/HeroTamplate.vue';
+    import OpenHours from '@/components/OpenHours.vue';
+    import FacilitetsInfo from '@/components/FacilitetsInfo.vue';
 
-import KlosterBakkenHero from '@/assets/images/faciliteter/klosterbakkenHero.webp'
-import Klosterbakken from '@/assets/images/faciliteter/klosterbakken.webp'
-import Sauna from '@/assets/images/faciliteter/sauna.webp'
-import AfslapningIkon from '@/assets/images/ikoner/afslapningIkon.webp'
-import BadIkon from '@/assets/images/ikoner/BadIkon.webp'
-import BilletIkon from '@/assets/images/ikoner/BilletIkon.webp'
-import CabinIkon from '@/assets/images/ikoner/CabinIkon.webp'
-import CafeteriIkon from '@/assets/images/ikoner/CafeteriIkon.webp'
-import DampIkon from '@/assets/images/ikoner/DampIkon.webp'
-import DybteIkon from '@/assets/images/ikoner/DybteIkon.webp'
-import FitnessIkon from '@/assets/images/ikoner/FitnessIkon.webp'
-import LivrederIkon from '@/assets/images/ikoner/LivrederIkon.webp'
-import PoolIkon from '@/assets/images/ikoner/PoolIkon.webp'
-import SaunaIkon from '@/assets/images/ikoner/SaunaIkon.webp'
-import SkabIkon from '@/assets/images/ikoner/SkabIkon.webp'
-import placeringIkon from '@/assets/images/ikoner/placering.webp'
+    import KlosterBakkenHero from '@/assets/images/faciliteter/klosterbakkenHero.webp'
+    import Klosterbakken from '@/assets/images/faciliteter/klosterbakken.webp'
+    import Sauna from '@/assets/images/faciliteter/sauna.webp'
+    import AfslapningIkon from '@/assets/images/ikoner/afslapningIkon.webp'
+    import BadIkon from '@/assets/images/ikoner/BadIkon.webp'
+    import BilletIkon from '@/assets/images/ikoner/BilletIkon.webp'
+    import CabinIkon from '@/assets/images/ikoner/CabinIkon.webp'
+    import CafeteriIkon from '@/assets/images/ikoner/CafeteriIkon.webp'
+    import DampIkon from '@/assets/images/ikoner/DampIkon.webp'
+    import DybteIkon from '@/assets/images/ikoner/DybteIkon.webp'
+    import FitnessIkon from '@/assets/images/ikoner/FitnessIkon.webp'
+    import LivrederIkon from '@/assets/images/ikoner/LivrederIkon.webp'
+    import PoolIkon from '@/assets/images/ikoner/PoolIkon.webp'
+    import SaunaIkon from '@/assets/images/ikoner/SaunaIkon.webp'
+    import SkabIkon from '@/assets/images/ikoner/SkabIkon.webp'
+    import placeringIkon from '@/assets/images/ikoner/placering.webp'
 
-const winterHours = [
-  { day: 'Mandag',  time: '06:30 - 20:00' },
-  { day: 'Tirsdag', time: '06:30 - 20:00' },
-  { day: 'Onsdag',  time: '06:30 - 20:00' },
-  { day: 'Torsdag', time: '13:30 - 18:30' },
-  { day: 'Fredag',  time: '06:30 - 18:30' },
-  { day: 'Lørdag',  time: '07:00 - 13:30' },
-  { day: 'Søndag',  time: '08:00 - 13:30' }
-]
+    const winterHours = [
+    { day: 'Mandag',  time: '06:30 - 20:00' },
+    { day: 'Tirsdag', time: '06:30 - 20:00' },
+    { day: 'Onsdag',  time: '06:30 - 20:00' },
+    { day: 'Torsdag', time: '13:30 - 18:30' },
+    { day: 'Fredag',  time: '06:30 - 18:30' },
+    { day: 'Lørdag',  time: '07:00 - 13:30' },
+    { day: 'Søndag',  time: '08:00 - 13:30' }
+    ]
 </script>
 
 <template>
@@ -142,40 +142,40 @@ const winterHours = [
 </template>
 
 <style lang="scss">
-.praktisk_info_container {
-margin: 20px;
-}
-
-.praktisk_info {
-margin-bottom: 50px;
-margin-top: 50px;
-}
-
-.praktisk_info_wrapper {
-padding: 0px 20px;
-}
-
-@media (min-width: 1024px) {
-    .praktisk_info_wrapper {
-        display: flex;
-        flex-direction: row;
-        padding: 2rem 4rem;
-    }
-
-    .praktisk_info_left {
-        width: 50%;
-        padding-right: 10px;
-    }
-
-    .praktisk_info_right {
-        width: 50%;
-        padding-left: 10px;
-    }
-
     .praktisk_info_container {
-        padding: 0px 4rem;
-        margin: 0px;
+    margin: 20px;
     }
 
-}
+    .praktisk_info {
+    margin-bottom: 50px;
+    margin-top: 50px;
+    }
+
+    .praktisk_info_wrapper {
+    padding: 0px 20px;
+    }
+
+    @media (min-width: 1024px) {
+        .praktisk_info_wrapper {
+            display: flex;
+            flex-direction: row;
+            padding: 2rem 4rem;
+        }
+
+        .praktisk_info_left {
+            width: 50%;
+            padding-right: 10px;
+        }
+
+        .praktisk_info_right {
+            width: 50%;
+            padding-left: 10px;
+        }
+
+        .praktisk_info_container {
+            padding: 0px 4rem;
+            margin: 0px;
+        }
+
+    }
 </style>

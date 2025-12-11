@@ -1,18 +1,18 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { loginAsUser, loginAsAdmin } from '@/stores/authState'
+  import { useRouter } from 'vue-router'
+  import { loginAsUser, loginAsAdmin } from '@/stores/authState'
 
-const router = useRouter()
+  const router = useRouter()
 
-function handleUserLogin () {
-  loginAsUser()
-  router.push('/')          // tilbage til forsiden
-}
+  function handleUserLogin () {
+    loginAsUser()
+    router.push('/')          // tilbage til forsiden
+  }
 
-function handleAdminLogin () {
-  loginAsAdmin()
-  router.push('/calendar')  // ind på admin-/calendar-siden
-}
+  function handleAdminLogin () {
+    loginAsAdmin()
+    router.push('/calendar')  // ind på admin-/calendar-siden
+  }
 </script>
 
 <template>
@@ -40,36 +40,36 @@ function handleAdminLogin () {
 </template>
 
 <style scoped>
-.wrapper {
-  padding: 40px clamp(1.5rem, 5vw, 70px) 70px;
-}
+  .wrapper {
+    padding: 40px clamp(1.5rem, 5vw, 70px) 70px;
+  }
 
-.loginChoice {
-  display: grid;
-  gap: 24px;
-  max-width: 480px;
-  margin-inline: auto;
-  text-align: center;
-}
+  .loginChoice {
+    display: grid;
+    gap: 24px;
+    max-width: 480px;
+    margin-inline: auto;
+    text-align: center;
+  }
 
-.loginChoice__title {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
+  .loginChoice__title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
 
-.loginChoice__options {
-  display: grid;
-  gap: 16px;
-}
+  .loginChoice__options {
+    display: grid;
+    gap: 16px;
+  }
 
-.loginChoice__btn {
-  border-radius: 999px;
-  padding: 12px 20px;
-  border: 1px solid #d0d4e4;
-  background: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
+  .loginChoice__btn {
+    border-radius: 999px;
+    padding: 12px 20px;
+    border: 1px solid #d0d4e4;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
 </style>
