@@ -45,18 +45,5 @@
       <p class="filter-bar__subtitle">
         Vi viser kun aktiviteter, der matcher dine valg.
       </p>
-  
-      <div class="filter-bar__chips">
-        <button
-          type="button"
-          class="filter-bar__chip"
-          :class="{ 'filter-bar__chip--active': localFilters.familyFriendly }"
-          @click="toggle('familyFriendly')"
-        >
-          👨‍👩‍👧‍👦 Familievenligt
-        </button>
-  
-        <!-- resten af chips som før ... -->
-      </div>
     </section>
   </template>

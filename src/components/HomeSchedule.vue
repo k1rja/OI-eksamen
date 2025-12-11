@@ -4,35 +4,34 @@
   import InfoDialog from '@/components/InfoDialog.vue'
   import { eventStartMs, dateKey, weekdayDa, formatDateDa } from '@/utils/date'
 
-  // Firebase base URL
   const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
   if (!DB_URL) {
     console.error('Mangler VITE_FIREBASE_DATABASE_URL i .env')
   }
 
-  // hvilken tab er aktiv: 'activities' eller 'events'
   const activeTab = ref('activities')
-
-  // vis / skjul filter-boks
   const showFilter = ref(false)
 
-  const events = ref([])      // hold
-  const activities = ref([])  // aktiviteter
+  const events = ref([])    
+  const activities = ref([]) 
   const loading = ref(false)
   const error = ref('')
 
-  // filter-state
-  const filters = ref({
-    kids: false,       // Børnevenligt (kun aktiviteter)
-    family: false,     // Familievenligt (kun aktiviteter)
-    indoor: false,
-    outdoor: false,
-    highTempo: false,  // maps til tag 'active'
-    lowTempo: false,   // maps til tag 'calm'
-    today: false,
-    tomorrow: false,
-    weekend: false,
-  })
+  function defaultFilters () {
+    return {
+      kids: false,     
+      family: false,     
+      indoor: false,
+      outdoor: false,
+      highTempo: false,
+      lowTempo: false,  
+      today: false,
+      tomorrow: false,
+      weekend: false,
+    }
+  }
+
+  const filters = ref(defaultFilters())
 
   onMounted(() => {
     loadAll()
@@ -71,16 +70,12 @@
     }
   }
 
-  /* ---------- helpers til filtrering ---------- */
-
   const hasAnyFilter = computed(() =>
     Object.values(filters.value).some(Boolean)
   )
 
   function resetFilters () {
-    Object.keys(filters.value).forEach(k => {
-      filters.value[k] = false
-    })
+    filters.value = defaultFilters()
   }
 
   function closeFilter () {
@@ -91,6 +86,7 @@
     activeTab.value = tab
   }
 
+
   /* TAG-fitre (AND-logik) */
 
   function matchesTagFilters (item) {
@@ -99,22 +95,18 @@
 
     const selected = []
 
-    // fælles tags
+  
     if (f.indoor) selected.push('indoor')
     if (f.outdoor) selected.push('outdoor')
-    if (f.highTempo) selected.push('active') // høj intensitet
-    if (f.lowTempo) selected.push('calm')    // roligt tempo
+    if (f.highTempo) selected.push('active') 
+    if (f.lowTempo) selected.push('calm')  
 
-    // kun aktiviteter
     if (activeTab.value === 'activities') {
       if (f.kids) selected.push('kids')
       if (f.family) selected.push('family')
     }
 
-    // ingen tag-filtre valgt → alt er ok
     if (!selected.length) return true
-
-    // OR-logik: aktiviteten skal have MINDEST ÉN af de valgte tags
     return selected.some(tag => tags.includes(tag))
   }
 
@@ -206,7 +198,6 @@
 
   const groups = computed(() => buildGroups(filteredItems.value))
 
-  // lille helper til badges i kortene
   function hasTag (item, tag) {
     return Array.isArray(item.tags) && item.tags.includes(tag)
   }
@@ -217,7 +208,7 @@
     class="homeSchedule"
     aria-labelledby="homeScheduleTitle"
   >
-    <!-- INFO-TEKST -->
+
     <aside class="homeSchedule__info">
       <h2 id="homeScheduleTitle" class="homeSchedule__infoTitle">
         Find din næste <span>aktivitet eller dit næste hold</span> her
@@ -235,7 +226,6 @@
       </a>
     </aside>
 
-    <!-- LISTE + TABS + FILTRERING -->
     <div class="homeSchedule__list">
       <header class="homeSchedule__tabs">
         <div class="homeSchedule__tabButtons">
@@ -342,7 +332,9 @@
                 :item="item"
                 :type-label="activeTab === 'activities' ? 'Aktivitet' : 'Hold'"
                 button-label="Info"
+                :show-book-button="true"
               />
+
 
               <a
                 v-if="activeTab === 'activities' && (item.linkPath || item.url)"
@@ -353,16 +345,16 @@
               </a>
 
               <BookBtn
-                v-if="activeTab === 'events'"
+                v-if="item.id"
                 :id="item.id"
               />
+
             </div>
           </li>
         </ul>
       </section>
     </div>
 
-    <!-- FILTER MODAL -->
     <div v-if="showFilter" class="filterModal">
       <div class="filterModal__backdrop" @click="closeFilter" />
 
@@ -505,8 +497,6 @@
     border-radius: 14px;
   }
 
-  /* INFO-kolonne */
-
   .homeSchedule__info {
     grid-area: info;
     align-self: start;
@@ -537,15 +527,11 @@
     box-shadow: 0 10px 20px rgba(243, 115, 65, 0.25);
   }
 
-  /* LISTE-kolonne */
-
   .homeSchedule__list {
     grid-area: list;
     display: grid;
     gap: 18px;
   }
-
-  /* tabs + filter */
 
   .homeSchedule__tabs {
     display: flex;
@@ -598,8 +584,6 @@
   }
 
 
-  /* fejl / tom liste */
-
   .homeSchedule__error {
     color: #b00020;
   }
@@ -607,8 +591,6 @@
   .homeSchedule__empty {
     margin: 0;
   }
-
-  /* dags-grupper */
 
   .homeSchedule__dayGroup {
     display: grid;
@@ -640,6 +622,7 @@
     border-radius: 14px;
     border: 1px solid #c5c8d3;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    min-height: 150px;
   }
 
   .homeSchedule__cardMain {
@@ -675,10 +658,17 @@
 
   .homeSchedule__tag {
     font-size: 0.8rem;
-    padding: 2px 8px;
-    border-radius: 999px;
     background: #eef0ff;
+    border-radius: 999px; 
+    height: 26px;      
+    display: inline-flex; 
+    justify-content: center;
+    align-items: center;
+    padding: 0 12px;  
+    white-space: nowrap; 
+    font-weight: 500;
   }
+
 
   .homeSchedule__cardActions {
     display: flex;
@@ -779,8 +769,6 @@
     flex-wrap: nowrap; 
   }
 
-  /* knapper = samme form som adminBtn */
-
   .btn {
     display: inline-flex;
     align-items: center;
@@ -793,11 +781,8 @@
     cursor: pointer;
     transition: 0.2s ease;
     font-family: f.$font-primary;
-
     border: 2px solid c.$cta;
     background: transparent;
-
-    /* gør at NULSTIL + GEM står på række */
     white-space: nowrap;
   }
 
@@ -846,7 +831,6 @@
       flex-wrap: nowrap;
     }
 
-    /* filter-modal: lille kort i højre side */
     .filterModal__panel {
       top: 150px;
       right: clamp(16px, 5vw, 70px);
@@ -859,12 +843,27 @@
     }
   }
 
-  /* desktop: to kolonner med info + liste */
-  @media (min-width: 900px) {
+  @media (min-width: 1024px) {
     .homeSchedule {
       grid-template-columns: 0.9fr 1.6fr;
       grid-template-areas: "info list";
+      align-items: center; 
+    }
+
+    .homeSchedule__info {
+      align-self: center;
+    }
+
+    .homeSchedule__list {
+      max-height: 70vh;    
+      overflow-y: auto;
+      padding-right: 6px;  
+    }
+
+    .homeSchedule__dayList {
+      padding-bottom: 8px;
     }
   }
+
 </style>
 

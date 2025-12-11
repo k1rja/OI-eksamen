@@ -11,10 +11,9 @@
   const error = ref('')
   const editing = ref(null)
 
-  // modal state
   const showConfirm = ref(false)
-  const confirmAction = ref(null)   // 'edit' | 'delete'
-  const confirmTarget = ref(null)   // event-objektet
+  const confirmAction = ref(null) 
+  const confirmTarget = ref(null) 
 
   function hasTag(ev, key) {
     return Array.isArray(ev.tags) && ev.tags.includes(key)
@@ -77,7 +76,7 @@
     }
   }
 
-  /* ---------- Modal logik ---------- */
+  /* ---------- Modal ---------- */
 
   function openConfirm(action, ev) {
     confirmAction.value = action
@@ -106,7 +105,7 @@
   }
 
   function onEdit(ev) {
-    editing.value = { ...ev }  // direkte redigering, ingen modal
+    editing.value = { ...ev } 
   }
 
 
@@ -138,7 +137,6 @@
 
 <template>
   <div class="adminGrid">
-    <!-- VENSTRE: formular -->
     <section class="adminGrid__panel">
       <h2 class="adminGrid__title">
         {{ editing ? 'Redigér hold' : 'Opret hold' }}
@@ -160,7 +158,6 @@
       </button>
     </section>
 
-    <!-- HØJRE: oversigt -->
     <section class="adminGrid__list">
       <header class="calendar__header">
         <h2 class="calendar__title">Holdoversigt</h2>
@@ -185,9 +182,7 @@
               <span v-if="ev.priceText"> • Pris: {{ ev.priceText }}</span>
             </div>
 
-            <p v-if="ev.description" class="calendar__desc">
-              {{ ev.description }}
-            </p>
+
 
             <div class="calendar__flags">
               <span
@@ -242,7 +237,6 @@
       <p v-else>Ingen hold oprettet endnu.</p>
     </section>
 
-    <!-- BEKRÆFTELSES-MODAL -->
     <div v-if="showConfirm" class="adminModal">
       <div class="adminModal__backdrop" @click="closeConfirm" />
 
@@ -274,7 +268,7 @@
             :class="confirmAction === 'delete' ? 'adminBtn--danger' : 'adminBtn--secondary'"
             @click="confirmActionNow"
           >
-            Ja, {{ confirmAction === 'delete' ? 'slet' : 'redigér' }}
+            {{ confirmAction === 'delete' ? 'slet' : 'redigér' }}
           </button>
         </div>
       </div>
@@ -287,7 +281,6 @@
   @use '../assets/_colors.scss' as c;
   @use '../assets/_fonts.scss' as f;
   
-  /* samme 2-kolonne layout som aktiviteter */
   .adminGrid {
     display: grid;
     gap: 24px;
@@ -300,7 +293,6 @@
     }
   }
   
-  /* overskrifter: Opret hold + Holdoversigt */
   .adminGrid__title,
   .calendar__title {
     margin: 0 0 10px;
@@ -311,14 +303,13 @@
   .adminGrid__cancel {
     margin-top: 8px;
   }
-  
-  /* ADMIN-KNAPPER – samme form som på resten af sitet */
+
   .adminBtn {
     display: inline-flex;
     justify-content: center;
     align-items: center;
     padding: 10px 26px;
-    border-radius: 10px; // matcher Tilmeld/Afmeld
+    border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -327,7 +318,6 @@
     border: 2px solid c.$cta;
   }
   
-  /* PRIMÆR (orange) – SLET */
   .adminBtn--danger {
     background: c.$cta;
     color: c.$color-secondary;
@@ -339,7 +329,6 @@
     }
   }
   
-  /* SEKUNDÆR (hvid med orange kant) – REDIGÉR / annuller */
   .adminBtn--secondary {
     background: c.$color-secondary;
     border: 3px solid c.$cta;
@@ -352,12 +341,10 @@
     }
   }
   
-  /* Hvis du vil have en "fuld bredde" knap (fx i formularer) */
   .adminBtn--full {
     width: 100%;
   }
-  
-  /* LISTE / KORT FOR HOLD */
+
   
   .calendar__header {
     display: flex;
@@ -415,7 +402,6 @@
     background: #eef2ff;
   }
   
-  /* responsiv stacking */
   @media (max-width: 1024px) {
     .calendar__item {
       flex-direction: column;
@@ -427,7 +413,6 @@
     }
   }
   
-  /* beskeder */
   .msg {
     font-size: 0.85rem;
     margin-top: 4px;
@@ -436,14 +421,12 @@
     color: #b00020;
   }
   
-  /* ---------- ADMIN CONFIRM-MODAL (samme look som BookBtn-modal) ---------- */
-  
   .adminModal {
     position: fixed;
     inset: 0;
     z-index: 999;
     display: grid;
-    place-items: center; // centrer boksen i viewport
+    place-items: center; 
   }
   
   .adminModal__backdrop {
@@ -452,10 +435,9 @@
     background: rgba(0, 0, 0, .35);
   }
   
-  /* Selve boksen – kopieret fra .modal i BookBtn */
   .adminModal__panel {
     position: relative;
-    width: min(640px, 92vw);          // samme bredde som booking-modal
+    width: min(640px, 92vw);    
     background: c.$color-secondary;
     border-radius: 14px;
     box-shadow:

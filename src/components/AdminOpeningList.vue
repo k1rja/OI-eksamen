@@ -13,9 +13,8 @@
   const editingChange = ref(null);
   const error = ref("");
   
-  // --- NYT: modal-state til slet ---
   const showConfirm = ref(false);
-  const confirmTarget = ref(null); // den ændring, der skal slettes
+  const confirmTarget = ref(null); 
   
   onMounted(() => {
     const unsub = listenOpeningChanges((all) => {
@@ -52,8 +51,7 @@
   function startEdit(change) {
     editingChange.value = { ...change };
   }
-  
-  // --- NYT: åbn modal i stedet for window.confirm ---
+
   function handleDelete(change) {
     confirmTarget.value = change;
     showConfirm.value = true;
@@ -70,8 +68,6 @@
   error.value = "";
   try {
     await deleteOpeningChange(confirmTarget.value.id);
-
-    // 🔥 fjern fra listen med det samme
     changes.value = changes.value.filter(
       c => c.id !== confirmTarget.value.id
     );
@@ -91,7 +87,6 @@
 function handleCreated(newChange) {
   editingChange.value = null;
 
-  // 🔥 læg den nye ændring i listen med det samme
   if (newChange) {
     changes.value.push(newChange);
   }
@@ -104,7 +99,6 @@ function handleUpdated(updatedChange) {
 
   const i = changes.value.findIndex(c => c.id === updatedChange.id);
   if (i !== -1) {
-    // 🔥 erstat eksisterende item i listen
     changes.value[i] = updatedChange;
   }
 }
@@ -115,7 +109,6 @@ function handleUpdated(updatedChange) {
 
 <template>
   <section class="adminOpening">
-    <!-- VENSTRE: formular -->
     <div class="adminOpening__left">
       <h2 class="adminOpening__title">Ændrede åbningstider</h2>
       <OpeningChangesForm
@@ -125,7 +118,6 @@ function handleUpdated(updatedChange) {
       />
     </div>
 
-    <!-- HØJRE: oversigt -->
     <div class="adminOpening__right">
       <h2 class="adminOpening__title">Oversigt</h2>
 
@@ -173,13 +165,13 @@ function handleUpdated(updatedChange) {
         </li>
       </ul>
     </div>
-        <!-- BEKRÆFTELSES-MODAL FOR ÅBNINGSTIDER -->
+    
     <div v-if="showConfirm" class="adminModal">
       <div class="adminModal__backdrop" @click="closeConfirm" />
 
       <div class="adminModal__panel" role="dialog" aria-modal="true">
         <h3 class="adminModal__title">
-          Bekræft sletning
+          Bekræft handling
         </h3>
 
         <p class="adminModal__text">
@@ -214,183 +206,175 @@ function handleUpdated(updatedChange) {
 </template>
 
 <style scoped lang="scss">
-@use '@/assets/_colors.scss' as c;
-@use '@/assets/_fonts.scss' as f;
+  @use '@/assets/_colors.scss' as c;
+  @use '@/assets/_fonts.scss' as f;
 
-.adminOpening {
-  display: grid;
-  gap: 24px;
-  margin-top: 20px;
-}
-
-@media (min-width: 900px) {
   .adminOpening {
-    grid-template-columns: 1.2fr 1fr;
+    display: grid;
+    gap: 24px;
+    margin-top: 20px;
   }
-}
 
-.adminOpening__title {
-  font-family: f.$font-secondary;
-  font-size: 1.6rem;
-  margin: 0 0 8px;
-}
-
-/* LISTE + KORT – matcher adminActivities */
-
-.adminOpening__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
-
-.adminOpening__item {
-  padding: 16px 18px;
-  background: c.$color-secondary;         /* samme som .card i AdminActivities */
-  border-radius: 14px;
-  border: 1px solid #c5c8d3;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-  display: grid;
-  gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.adminOpening__itemMain {
-  display: grid;
-  gap: 4px;
-}
-
-.adminOpening__facility {
-  margin: 0;
-  font-weight: 700;
-}
-
-.adminOpening__meta {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.adminOpening__reason {
-  margin: 0;
-  color: #444;
-  font-style: italic;
-  font-size: 0.9rem;
-}
-
-.adminOpening__empty {
-  color: #666;
-  padding: 8px 0;
-}
-
-.adminOpening__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-}
-
-/* --- ADMIN KNAPPER: samme som i AdminActivities --- */
-
-.adminBtn {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 26px;
-  border-radius: 10px;
-  min-width:140px;
-  font-size: 0.95rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.2s ease;
-  border: 2px solid c.$cta;
-}
-
-/* Primær (orange) – SLET */
-.adminBtn--danger {
-  background: c.$cta;
-  color: c.$color-secondary;
-
-  &:hover {
-    background: c.$color-tertiary;
-    border-color: c.$color-tertiary;
-    transform: translateY(-1px);
+  @media (min-width: 900px) {
+    .adminOpening {
+      grid-template-columns: 1.2fr 1fr;
+    }
   }
-}
 
-/* Sekundær (hvid med orange kant) – REDIGER */
-.adminBtn--secondary {
-  background: #fefffe;
-  border: 3px solid c.$cta;
-  color: c.$cta;
-
-  &:hover {
-    border-color: c.$color-tertiary;
-    color: c.$color-tertiary;
-    transform: translateY(-1px);
+  .adminOpening__title {
+    font-family: f.$font-secondary;
+    font-size: 1.6rem;
+    margin: 0 0 8px;
   }
-}
 
-.adminOpening__error {
-  color: #b00020;
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
+  .adminOpening__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
 
-/* ---------- ADMIN CONFIRM-MODAL (samme look som i AdminEvents) ---------- */
+  .adminOpening__item {
+    padding: 16px 18px;
+    background: c.$color-secondary;   
+    border-radius: 14px;
+    border: 1px solid #c5c8d3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
 
-.adminModal {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  display: grid;
-  place-items: center;
-}
+  .adminOpening__itemMain {
+    display: grid;
+    gap: 4px;
+  }
 
-.adminModal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, .35);
-}
+  .adminOpening__facility {
+    margin: 0;
+    font-weight: 700;
+  }
 
-.adminModal__panel {
-  position: relative;
-  width: min(640px, 92vw);
-  background: c.$color-secondary;
-  border-radius: 14px;
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, .25),
-    0 2px 6px rgba(0, 0, 0, .15);
-  padding: 50px 40px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+  .adminOpening__meta {
+    margin: 0;
+    font-size: 0.9rem;
+  }
 
-.adminModal__title {
-  font-family: f.$font-secondary;
-  color: c.$color-primary;
-  font-weight: 600;
-  font-size: clamp(24px, 3.2vw, 40px);
-  line-height: 1.1;
-  margin: 0 0 12px;
-  text-align: center;
-}
+  .adminOpening__reason {
+    margin: 0;
+    color: #444;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
 
-.adminModal__text {
-  color: c.$color-primary;
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0 0 20px;
-  text-align: center;
-}
+  .adminOpening__empty {
+    color: #666;
+    padding: 8px 0;
+  }
 
-.adminModal__actions {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 8px;
-}
+  .adminOpening__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
 
+
+  .adminBtn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 26px;
+    border-radius: 10px;
+    min-width:140px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.2s ease;
+    border: 2px solid c.$cta;
+  }
+
+  .adminBtn--danger {
+    background: c.$cta;
+    color: c.$color-secondary;
+
+    &:hover {
+      background: c.$color-tertiary;
+      border-color: c.$color-tertiary;
+      transform: translateY(-1px);
+    }
+  }
+
+  .adminBtn--secondary {
+    background: #fefffe;
+    border: 3px solid c.$cta;
+    color: c.$cta;
+
+    &:hover {
+      border-color: c.$color-tertiary;
+      color: c.$color-tertiary;
+      transform: translateY(-1px);
+    }
+  }
+
+  .adminOpening__error {
+    color: #b00020;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+
+  .adminModal {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: grid;
+    place-items: center;
+  }
+
+  .adminModal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+  }
+
+  .adminModal__panel {
+    position: relative;
+    width: min(640px, 92vw);
+    background: c.$color-secondary;
+    border-radius: 14px;
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, .25),
+      0 2px 6px rgba(0, 0, 0, .15);
+    padding: 50px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .adminModal__title {
+    font-family: f.$font-secondary;
+    color: c.$color-primary;
+    font-weight: 600;
+    font-size: clamp(24px, 3.2vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 12px;
+    text-align: center;
+  }
+
+  .adminModal__text {
+    color: c.$color-primary;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 20px;
+    text-align: center;
+  }
+
+  .adminModal__actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 8px;
+  }
 </style>

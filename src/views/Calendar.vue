@@ -5,7 +5,7 @@
   import AdminEvents from '@/components/AdminEvents.vue'
   import AdminOpeningList from '@/components/AdminOpeningList.vue'
 
-  const activeTab = ref('events')
+  const activeTab = ref('activities')
 </script>
 
 <template>

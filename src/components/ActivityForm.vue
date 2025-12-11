@@ -1,18 +1,19 @@
 <script setup>
   import { ref, watch } from 'vue'
-
+  
   const props = defineProps({
-    activity: { type: Object, default: null }, // bruges ved redigering
+    activity: { type: Object, default: null },
   })
-
+  
   const emit = defineEmits(['created', 'updated', 'cancel'])
-
+  
   const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
-
+  
   const form = ref({
     id: null,
     title: '',
-    lead: '',
+    lead: '',       
+    description: '', 
     date: '',
     start: '',
     end: '',
@@ -21,7 +22,6 @@
     infoText: '',
     whatToBring: '',
     facilityOpeningHours: '',
-    // tags
     isFamily: false,
     isKids: false,
     isIndoor: false,
@@ -29,11 +29,11 @@
     isCalm: false,
     isActive: false,
   })
-
+  
   const submitting = ref(false)
   const error = ref('')
   const success = ref(false)
-
+  
   function parsePrice(txt) {
     if (txt == null) return 0
     const s = String(txt).replace(',', '.')
@@ -41,7 +41,7 @@
     return m ? Number(m[1]) : 0
   }
   const clamp0 = (n) => (Number.isFinite(n) && n > 0 ? n : 0)
-
+  
   function buildTagsFromForm() {
     const f = form.value
     return [
@@ -53,8 +53,8 @@
       f.isActive && 'active',
     ].filter(Boolean)
   }
-
-  // sync når vi redigerer
+  
+  // sync når redigerer
   watch(
     () => props.activity,
     (act) => {
@@ -64,6 +64,7 @@
           id: act.id ?? null,
           title: act.title ?? '',
           lead: act.lead ?? '',
+          description: act.description ?? '', 
           date: act.date ?? '',
           start: act.start ?? '',
           end: act.end ?? '',
@@ -85,6 +86,7 @@
           id: null,
           title: '',
           lead: '',
+          description: '',
           date: '',
           start: '',
           end: '',
@@ -106,23 +108,24 @@
     },
     { immediate: true }
   )
-
+  
   async function onSubmit() {
     error.value = ''
     success.value = false
-
+  
     if (!form.value.title) {
       error.value = 'Skriv mindst en titel på aktiviteten.'
       return
     }
-
+  
     const priceText = form.value.priceText ?? ''
     const price = clamp0(parsePrice(priceText))
     const tags = buildTagsFromForm()
-
+  
     const basePayload = {
       title: form.value.title,
       lead: form.value.lead || '',
+      description: form.value.description || '', 
       date: form.value.date || '',
       start: form.value.start || '',
       end: form.value.end || '',
@@ -134,7 +137,7 @@
       facilityOpeningHours: form.value.facilityOpeningHours || '',
       tags,
     }
-
+  
     submitting.value = true
     try {
       // REDIGERING
@@ -144,7 +147,7 @@
         success.value = true
         return
       }
-
+  
       // OPRETTELSE
       const res = await fetch(`${DB_URL}/activities.json`, {
         method: 'POST',
@@ -156,14 +159,15 @@
       })
       if (!res.ok) throw new Error('HTTP ' + res.status)
       const { name: id } = await res.json()
-
+  
       const created = { id, ...basePayload }
       emit('created', created)
-
+  
       form.value = {
         id: null,
         title: '',
         lead: '',
+        description: '',
         date: '',
         start: '',
         end: '',
@@ -188,12 +192,12 @@
       if (success.value && !props.activity) setTimeout(() => (success.value = false), 1200)
     }
   }
-
+  
   function onCancel() {
     emit('cancel')
   }
 </script>
-
+  
 <template>
   <form class="adminForm" @submit.prevent="onSubmit">
     <label>
@@ -236,7 +240,7 @@
 
     <label>
       Beskrivelse
-      <textarea v-model.trim="form.lead" rows="3" />
+      <textarea v-model.trim="form.description" rows="3" />
     </label>
 
     <label>
@@ -291,7 +295,7 @@
 
       <label>
         <input type="checkbox" v-model="form.isCalm" />
-        Rolig aktivitet
+        Roligt tempo
       </label>
 
       <label>
@@ -299,6 +303,7 @@
         Høj intensitet
       </label>
     </fieldset>
+
 
     <div class="adminForm__actions">
       <button
@@ -325,6 +330,7 @@
     </p>
   </form>
 </template>
+  
 
 <style scoped lang="scss">
   @use '../assets/_colors.scss' as c;
@@ -388,15 +394,13 @@
     margin-top: 4px;
   }
 
-  /* knapper – bruger din globale mixin */
   .adminBtn {
     @include btn.button(btn.$button-primary);
-    display: inline-flex;   // gør den smal
+    display: inline-flex; 
     margin-top: 12px;
     cursor: pointer;
   }
 
-  /* beskeder */
   .msg {
     font-size: 0.85rem;
     margin-top: 4px;

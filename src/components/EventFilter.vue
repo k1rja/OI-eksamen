@@ -4,11 +4,10 @@
       type: Array,
       default: () => [],
     },
-    // her fortæller du, hvilke knapper der skal vises
+
     options: {
       type: Array,
       default: () => [
-        // fx: { key: 'family', label: 'Familievenlig', icon: '👨‍👩‍👧‍👦' }
       ],
     },
     title: {
@@ -62,8 +61,6 @@
   @use '@/assets/_fonts.scss' as f;
   @use '@/assets/_buttons.scss' as btn;
 
-  /* -------- OVERLAY-KONTAINER -------- */
-
   .filterBar {
     position: fixed;
     inset: 0;
@@ -77,12 +74,10 @@
     background: rgba(0, 0, 0, 0.35);
   }
 
-  /* -------- PANEL: LILLE KORT I HØJRE SIDE -------- */
-
   .filterBar__panel {
     position: absolute;
-    top: 90px;                                   // afstand fra top (tilpas efter behov)
-    right: clamp(16px, 5vw, 70px);              // afstand fra højre
+    top: 90px;                             
+    right: clamp(16px, 5vw, 70px);        
     background: c.$color-secondary;
     border-radius: 16px;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
@@ -95,8 +90,6 @@
     gap: 16px;
     overflow-y: auto;
   }
-
-  /* Mobil: mere “bottom sheet” */
 
   @media (max-width: 680px) {
     .filterBar__panel {
@@ -111,15 +104,11 @@
     }
   }
 
-  /* -------- INDHOLD (OVERSKRIFT, CHIPS, FOOTER) -------- */
-
   .filterBar__title {
     margin: 0 0 4px;
     font-family: f.$font-secondary;
     font-size: 1.1rem;
   }
-
-  /* CHIPS – som du havde dem før */
 
   $chip-config: map-merge(btn.$button-primary, (
     bg: c.$color-secondary,
@@ -160,8 +149,6 @@
     font-size: 1rem;
   }
 
-  /* FOOTER MED KNAPPER (NULSTIL / GEM) */
-
   .filterBar__footer {
     margin-top: 16px;
     display: flex;
@@ -169,14 +156,13 @@
     gap: 10px;
   }
 
-  /* knapper ca. som adminBtn */
 
   .filterBar__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    padding: 10px 26px;        // “adminBtn-størrelse”
+    padding: 10px 26px;   
     border-radius: 999px;
     font-size: 0.95rem;
     font-weight: 800;
