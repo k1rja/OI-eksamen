@@ -12,13 +12,14 @@
   const form = ref({
     id: null,
     title: '',
-    lead: '',       
-    description: '', 
+    lead: '',
+    description: '',
     date: '',
     start: '',
     end: '',
     location: '',
     priceText: '',
+    isFree: false,         
     infoText: '',
     whatToBring: '',
     facilityOpeningHours: '',
@@ -35,12 +36,12 @@
   const success = ref(false)
   
   function parsePrice(txt) {
-    if (txt == null) return 0
-    const s = String(txt).replace(',', '.')
-    const m = s.match(/(\d+(\.\d+)?)/)
+    if (!txt) return 0
+    const m = String(txt).replace(',', '.').match(/(\d+(\.\d+)?)/)
     return m ? Number(m[1]) : 0
   }
-  const clamp0 = (n) => (Number.isFinite(n) && n > 0 ? n : 0)
+  
+  const clamp0 = n => (Number.isFinite(n) && n > 0 ? n : 0)
   
   function buildTagsFromForm() {
     const f = form.value
@@ -51,26 +52,27 @@
       f.isOutdoor && 'outdoor',
       f.isCalm && 'calm',
       f.isActive && 'active',
+      f.isFree && 'free',    
     ].filter(Boolean)
   }
   
-  // sync når redigerer
+  /* sync ved redigering */
   watch(
     () => props.activity,
-    (act) => {
+    act => {
       if (act) {
         const tags = Array.isArray(act.tags) ? act.tags : []
         form.value = {
           id: act.id ?? null,
           title: act.title ?? '',
           lead: act.lead ?? '',
-          description: act.description ?? '', 
+          description: act.description ?? '',
           date: act.date ?? '',
           start: act.start ?? '',
           end: act.end ?? '',
           location: act.location ?? '',
-          priceText:
-            act.priceText ?? (Number.isFinite(act.price) ? String(act.price) : ''),
+          priceText: act.priceText ?? '',
+          isFree: act.isFree ?? tags.includes('free'),  
           infoText: act.infoText ?? '',
           whatToBring: act.whatToBring ?? '',
           facilityOpeningHours: act.facilityOpeningHours ?? '',
@@ -92,6 +94,7 @@
           end: '',
           location: '',
           priceText: '',
+          isFree: false,    
           infoText: '',
           whatToBring: '',
           facilityOpeningHours: '',
@@ -118,20 +121,27 @@
       return
     }
   
-    const priceText = form.value.priceText ?? ''
-    const price = clamp0(parsePrice(priceText))
     const tags = buildTagsFromForm()
+  
+    const priceText = form.value.isFree
+      ? 'Gratis'
+      : (form.value.priceText ?? '')
+  
+    const price = form.value.isFree
+      ? 0
+      : clamp0(parsePrice(priceText))
   
     const basePayload = {
       title: form.value.title,
       lead: form.value.lead || '',
-      description: form.value.description || '', 
+      description: form.value.description || '',
       date: form.value.date || '',
       start: form.value.start || '',
       end: form.value.end || '',
       location: form.value.location || '',
       priceText,
       price,
+      isFree: !!form.value.isFree, 
       infoText: form.value.infoText || '',
       whatToBring: form.value.whatToBring || '',
       facilityOpeningHours: form.value.facilityOpeningHours || '',
@@ -140,63 +150,31 @@
   
     submitting.value = true
     try {
-      // REDIGERING
       if (props.activity && form.value.id) {
-        const updated = { id: form.value.id, ...basePayload }
-        emit('updated', updated)
+        emit('updated', { id: form.value.id, ...basePayload })
         success.value = true
         return
       }
   
-      // OPRETTELSE
       const res = await fetch(`${DB_URL}/activities.json`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...basePayload,
-          createdAt: Date.now(),
-        }),
+        body: JSON.stringify({ ...basePayload, createdAt: Date.now() }),
       })
-      if (!res.ok) throw new Error('HTTP ' + res.status)
+  
       const { name: id } = await res.json()
+      emit('created', { id, ...basePayload })
   
-      const created = { id, ...basePayload }
-      emit('created', created)
-  
-      form.value = {
-        id: null,
-        title: '',
-        lead: '',
-        description: '',
-        date: '',
-        start: '',
-        end: '',
-        location: '',
-        priceText: '',
-        infoText: '',
-        whatToBring: '',
-        facilityOpeningHours: '',
-        isFamily: false,
-        isKids: false,
-        isIndoor: false,
-        isOutdoor: false,
-        isCalm: false,
-        isActive: false,
-      }
+      form.value.id = null
       success.value = true
     } catch (e) {
-      console.error(e)
       error.value = 'Kunne ikke gemme aktiviteten.'
     } finally {
       submitting.value = false
-      if (success.value && !props.activity) setTimeout(() => (success.value = false), 1200)
     }
   }
-  
-  function onCancel() {
-    emit('cancel')
-  }
 </script>
+  
   
 <template>
   <form class="adminForm" @submit.prevent="onSubmit">
@@ -230,12 +208,19 @@
       />
     </label>
 
+
     <label>
       Pris
       <input
         v-model.trim="form.priceText"
-        placeholder="Fx. 40 kr., Gratis, 2 klip"
+        :disabled="form.isFree"
+        placeholder="Fx. 40 kr., 2 klip"
       />
+    </label>
+
+    <label class="adminForm__inlineCheck">
+      <input type="checkbox" v-model="form.isFree" />
+      Gratis
     </label>
 
     <label>

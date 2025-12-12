@@ -17,6 +17,7 @@
     end: '',
     location: '',
     priceText: '',
+    isFree: false, 
     description: '',
     infoText: '',
     whatToBring: '',
@@ -50,6 +51,7 @@
       f.isOutdoor && 'outdoor',
       f.isCalm && 'calm',
       f.isActive && 'active',
+      f.isFree && 'free', 
     ].filter(Boolean)
   }
 
@@ -65,8 +67,8 @@
           start: ev.start ?? '',
           end: ev.end ?? '',
           location: ev.location ?? '',
-          priceText:
-            ev.priceText ?? (Number.isFinite(ev.price) ? String(ev.price) : ''),
+          priceText: ev.priceText ?? (Number.isFinite(ev.price) ? String(ev.price) : ''),
+          isFree: act.isFree ?? tags.includes('free'), 
           description: ev.description ?? '',
           infoText: ev.infoText ?? '',
           whatToBring: ev.whatToBring ?? '',
@@ -87,6 +89,7 @@
           end: '',
           location: '',
           priceText: '',
+          isFree: false, 
           description: '',
           infoText: '',
           whatToBring: '',
@@ -126,6 +129,7 @@
       location: form.value.location || '',
       priceText,
       price,
+      isFree: !!form.value.isFree,
       description: form.value.description || '',
       infoText: form.value.infoText || '',
       whatToBring: form.value.whatToBring || '',
@@ -234,6 +238,11 @@
         v-model.trim="form.priceText"
         placeholder="Fx. 40 kr., Gratis, 2 klip"
       />
+    </label>
+
+    <label class="adminForm__inlineCheck">
+      <input type="checkbox" v-model="form.isFree" />
+      Gratis
     </label>
 
     <label>Beskrivelse</label>

@@ -2,13 +2,15 @@
   import { ref, computed, onMounted } from 'vue'
   import BookBtn from '@/components/BookBtn.vue'
   import { eventStartMs, dateKey, weekdayDa, formatDateDa } from '@/utils/date'
+  import InfoDialog from '@/components/InfoDialog.vue'
+
 
   const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
   if (!DB_URL) {
     console.error('Mangler VITE_FIREBASE_DATABASE_URL i .env')
   }
 
-  const activeTab = ref('events')
+  const activeTab = ref('activities')
 
   const events = ref([])     
   const activities = ref([]) 
@@ -25,6 +27,7 @@
     today: false,
     tomorrow: false,
     weekend: false,
+    free: false,
   })
 
   onMounted(loadAll)
@@ -83,8 +86,10 @@
     // fælles tags
     if (f.indoor) selected.push('indoor')
     if (f.outdoor) selected.push('outdoor')
-    if (f.highTempo) selected.push('highTempo')
-    if (f.lowTempo) selected.push('lowTempo')
+    if (f.highTempo) selected.push('active')
+    if (f.lowTempo) selected.push('calm')
+    if (f.free) selected.push('free')
+
 
     // kun aktiviteter
     if (activeTab.value === 'activities') {
@@ -92,7 +97,6 @@
       if (f.family) selected.push('family')
     }
 
-    // ingen tag-filtre valgt → alt vises
     if (!selected.length) return true
 
     // OR-logik: MINDEST én af de valgte tags skal matche
@@ -257,6 +261,10 @@
             <span>Lavt tempo</span>
             </label>
             <label class="eventsPage__filterCheckbox">
+              <input v-model="filters.free" type="checkbox" />
+              <span>Gratis</span>
+            </label>
+            <label class="eventsPage__filterCheckbox">
             <input v-model="filters.today" type="checkbox" />
             <span>I dag</span>
             </label>
@@ -301,71 +309,73 @@
             </h2>
 
             <ul class="eventsPage__list">
-                <li
-                    v-for="item in group.items"
-                    :key="item.id"
-                    class="eventsPage__card"
-                    >
-                    <div class="eventsPage__cardMain">
-                        <h3 class="eventsPage__cardTitle">
-                        {{ item.title || 'Uden titel' }}
-                        </h3>
+              <li
+                  v-for="item in group.items"
+                  :key="item.id"
+                  class="eventsPage__card"
+                  >
+                  <div class="eventsPage__cardMain">
+                    <h3 class="eventsPage__cardTitle">
+                    {{ item.title || 'Uden titel' }}
+                    </h3>
 
-                        <p class="eventsPage__cardMeta">
-                        <span>
-                            Kl. {{ item.start || '—' }} – {{ item.end || '—' }}
-                        </span>
-                        <span v-if="item.location">
-                            • {{ item.location }}
-                        </span>
-                        <span v-if="item.priceText || item.price">
-                            • {{ item.priceText ?? (item.price ? item.price + ' kr.' : '') }}
-                        </span>
-                        </p>
+                    <p class="eventsPage__cardMeta">
+                    <span>
+                        Kl. {{ item.start || '—' }} – {{ item.end || '—' }}
+                    </span>
+                    <span v-if="item.location">
+                        • {{ item.location }}
+                    </span>
+                    <span v-if="item.priceText || item.price">
+                        • {{ item.priceText ?? (item.price ? item.price + ' kr.' : '') }}
+                    </span>
+                    </p>
 
-                        <p
-                        v-if="item.lead || item.shortIntro"
-                        class="eventsPage__cardLead"
-                        >
-                        {{ item.lead || item.shortIntro }}
-                        </p>
+                    <p
+                      v-if="item.lead || item.shortIntro"
+                      class="eventsPage__cardLead"
+                      >
+                      {{ item.lead || item.shortIntro }}
+                    </p>
 
-                        <div class="eventsPage__cardTags">
-                            <span v-if="hasTag(item, 'kids')" class="eventsPage__tag">
-                                Børnevenlig
-                            </span>
-                            <span v-if="hasTag(item, 'family')" class="eventsPage__tag">
-                                Familie
-                            </span>
-                            <span v-if="hasTag(item, 'indoor')" class="eventsPage__tag">
-                                Indendørs
-                            </span>
-                            <span v-if="hasTag(item, 'outdoor')" class="eventsPage__tag">
-                                Udendørs
-                            </span>
-                            <span v-if="hasTag(item, 'highTempo')" class="eventsPage__tag">
-                                Højt tempo
-                            </span>
-                            <span v-if="hasTag(item, 'lowTempo')" class="eventsPage__tag">
-                                Lavt tempo
-                            </span>
-                        </div>
+                    <div class="eventsPage__cardTags">
+                      <span v-if="hasTag(item, 'kids')" class="eventsPage__tag">
+                          Børnevenlig
+                      </span>
+                      <span v-if="hasTag(item, 'family')" class="eventsPage__tag">
+                          Familie
+                      </span>
+                      <span v-if="hasTag(item, 'indoor')" class="eventsPage__tag">
+                          Indendørs
+                      </span>
+                      <span v-if="hasTag(item, 'outdoor')" class="eventsPage__tag">
+                          Udendørs
+                      </span>
+                      <span v-if="hasTag(item, 'highTempo')" class="eventsPage__tag">
+                          Højt tempo
+                      </span>
+                      <span v-if="hasTag(item, 'lowTempo')" class="eventsPage__tag">
+                          Lavt tempo
+                      </span>
+                      <span v-if="hasTag(item, 'free')" class="eventsPage__tag">
+                        Gratis
+                      </span>
+
                     </div>
+                  </div>
 
-                    <div class="eventsPage__cardActions">
-                        <a
-                        v-if="activeTab === 'activities'"
-                        class="eventsPage__cardLink"
-                        :href="item.linkPath || item.url || '#'"
-                        >
-                        Læs mere
-                        </a>
+                  <div class="eventsPage__cardActions">
+                    <InfoDialog
+                      :item="item"
+                      :type-label="activeTab === 'activities' ? 'Aktivitet' : 'Hold'"
+                      button-label="Info"
+                      :show-book-button="true"
+                    />
 
-                        <BookBtn
-                        v-else
-                        :id="item.id"
-                        />
-                    </div>
+                    <BookBtn
+                      :id="item.id"
+                    />
+                  </div>
                 </li>
             </ul>
         </section>
@@ -554,7 +564,10 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
   }
+
 
   .eventsPage__cardLink {
     text-decoration: none;

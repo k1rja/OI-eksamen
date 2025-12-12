@@ -24,7 +24,8 @@
       indoor: false,
       outdoor: false,
       highTempo: false,
-      lowTempo: false,  
+      lowTempo: false, 
+      free: false, 
       today: false,
       tomorrow: false,
       weekend: false,
@@ -100,6 +101,8 @@
     if (f.outdoor) selected.push('outdoor')
     if (f.highTempo) selected.push('active') 
     if (f.lowTempo) selected.push('calm')  
+    if (f.free) selected.push('free')
+
 
     if (activeTab.value === 'activities') {
       if (f.kids) selected.push('kids')
@@ -324,6 +327,10 @@
                 <span v-if="hasTag(item, 'calm')" class="homeSchedule__tag">
                   Roligt tempo
                 </span>
+                <span v-if="hasTag(item, 'free')" class="homeSchedule__tag">
+                  Gratis
+                </span>
+
               </div>
             </div>
 
@@ -426,6 +433,15 @@
             />
             <span>Roligt tempo</span>
           </label>
+
+          <label class="filterCheckbox">
+            <input
+              v-model="filters.free"
+              type="checkbox"
+            />
+            <span>Gratis</span>
+          </label>
+
         </div>
 
         <div class="filterModal__section">
