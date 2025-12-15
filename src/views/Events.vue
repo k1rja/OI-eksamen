@@ -6,14 +6,11 @@
 
 
   const DB_URL = import.meta.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '')
-  if (!DB_URL) {
-    console.error('Mangler VITE_FIREBASE_DATABASE_URL i .env')
-  }
-
+  
   const activeTab = ref('activities')
 
   const events = ref([])     
-  const activities = ref([]) 
+  const activities = ref([])
   const loading = ref(false)
   const error = ref('')
 

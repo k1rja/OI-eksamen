@@ -11,7 +11,6 @@
   
   const open = ref(false)
 
-  // KUN description/lead bruges til "Om ..."
   const primaryText = computed(() => {
     const it = props.item || {}
     return it.description || it.lead || ''

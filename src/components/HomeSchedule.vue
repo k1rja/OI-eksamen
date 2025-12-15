@@ -19,8 +19,6 @@
 
   function defaultFilters () {
     return {
-      kids: false,     
-      family: false,     
       indoor: false,
       outdoor: false,
       highTempo: false,

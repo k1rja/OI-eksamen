@@ -22,7 +22,7 @@ $button-primary: (
   hover-border: c.$color-primary
 ) !default;
 
-// Mixin der læser værdierne fra config'en
+// Mixin der læser værdierne
 @mixin button($cfg) {
   $bg:       map-get($cfg, bg);
   $color:    map-get($cfg, color);

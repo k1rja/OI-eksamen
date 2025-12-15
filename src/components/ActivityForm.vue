@@ -56,7 +56,6 @@
     ].filter(Boolean)
   }
   
-  /* sync ved redigering */
   watch(
     () => props.activity,
     act => {
@@ -383,7 +382,6 @@
     @include btn.button(btn.$button-primary);
     display: inline-flex; 
     margin-top: 12px;
-    cursor: pointer;
   }
 
   .msg {
